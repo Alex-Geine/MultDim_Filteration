@@ -117,6 +117,23 @@ std::complex<double>** Signal::GetDataArray()
     return m_dataArray;
 };
 
+// Get energy of signal
+double Signal::GetEnergy()
+{
+    double energy = 0;
+
+    for (uint64_t i = 0; i < m_strings; ++i)
+    {
+        for (uint64_t j = 0; j < m_colomns; ++j)
+        {
+            energy += m_dataArray[i][j].real() * m_dataArray[i][j].real();
+            energy += m_dataArray[i][j].imag() * m_dataArray[i][j].imag();
+        }
+    }
+
+    return energy;
+};
+
 // Delete data array function
 void Signal::DeleteDataArray()
 {

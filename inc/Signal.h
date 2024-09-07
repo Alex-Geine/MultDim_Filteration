@@ -4,6 +4,8 @@
 #include <iostream>
 #include <complex>
 #include <math.h>
+#include <time.h>
+
 
 #define  N                      512                          // Base dimension of signal
 #define  NUMBER_IS_2_POW_K(x)   ((!((x)&((x)-1)))&&((x)>1))  // x is pow(2, k), k=1,2, ...
@@ -52,6 +54,9 @@ class Signal
 
     // Get number of strings
     uint64_t GetNumberOfStrings();
+
+    // Get energy of signal
+    double GetEnergy();
 
     // Set number of colomns
     void SetNumberOfColomns(uint64_t colomns);
@@ -174,15 +179,15 @@ class RealSignal : public Signal
 };
 
 // Multidimensional FFT
-bool g_MFFT(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag);
+bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag);
 
 // FFT
-bool g_FFT(std::complex<double>* inData, std::complex<double>* outData, uint64_t size, uint64_t flag);
+bool g_fft(std::complex<double>* inData, std::complex<double>* outData, uint64_t size, uint64_t flag);
 
 // Noize function
-bool g_NoizeSignal(const Signal& sig, double Db);
+bool g_noizeSignal(const Signal& sig, double Db);
 
 // Filtration function
-bool g_SquareFiltration(const Signal& sig, double Db);
+bool g_squareFiltration(const Signal& sig, double Db);
 
 #endif    // SIGNAL_H

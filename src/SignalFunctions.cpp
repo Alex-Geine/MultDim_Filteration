@@ -3,7 +3,7 @@
 // Signal functions
 
 // FFT
-bool g_FFT(std::complex<double>** inData, std::complex<double>* outData, uint64_t size, uint64_t flag)
+bool g_fft(std::complex<double>** inData, std::complex<double>* outData, uint64_t size, uint64_t flag)
 {
     // Prepare data
     uint64_t logN = std::log2(size);
@@ -120,7 +120,7 @@ bool g_FFT(std::complex<double>** inData, std::complex<double>* outData, uint64_
 };
 
 // Multidimensional FFT
-bool g_MFFT(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag)
+bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag)
 {
     if (inData  == nullptr)   return false;
     if (outData == nullptr)   return false;
@@ -174,6 +174,45 @@ bool g_MFFT(std::complex<double>** inData, std::complex<double>** outData, uint6
 
     delete[] colData;
     delete[] strData;
+
+    return true;
+};
+
+// Random generator
+double g_random()
+{
+    double res = 0;
+
+    for (uint64_t i = 0; i < 12; ++i)
+        res += -1. + 2 * (double)std::rand() / RAND_MAX;
+
+    return a;
+};
+
+// Noize function
+bool g_noizeSignal(const Signal& sig, double Db)
+{
+    uint64_t colomns = sig.GetNumberOfColomns();
+    uint64_t strings = sig.GetNumberOfStrings();
+
+    if ((colomns == 0) || (strings == 0))
+        return false;
+
+    Signal noise(colomns, strings);
+    std::complex<double>** noiseData = noise.GetDataArray();
+    std::complex<double>** sigData   = sig.GetDataArray();
+
+    for (uint64_t i = 0; i < strings; ++i)
+        for (uint64_t j = 0; j < colomns; ++j)
+            noiseData[i][j].real(g_random());
+
+    double energySig   = sig.GetEnergy();
+    double energyNoise = noise.GetEnery();
+    double koef        = energySig / energyNoise * (std::pow(10, Db / 10);
+
+    for (uint64_t i = 0; i < strings; ++i)
+         for (uint64_t j = 0; j < colomns; ++j)
+             sigData[i][j].real(sigData[i][j].real() + koef * noiseData[i][j].real());
 
     return true;
 };
