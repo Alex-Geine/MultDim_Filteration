@@ -5,6 +5,18 @@
 // Default constructor
 Signal::Signal(){};
 
+// Constructor with zeor data
+Signal::Signal(uint64_t colomns, uint64_t strings) : m_colomns(colomns), m_strings(strings)
+{
+    if ((m_colomns != 0) && (m_strings != 0))
+    {
+        m_dataArray = new std::complex<double>*[m_strings];
+
+        for (uint64_t i = 0; i < m_strings; ++i)
+            m_dataArray[i] = new std::complex<double>[m_colomns];
+    }
+};
+
 // Default destructor
 Signal::~Signal()
 {
@@ -86,6 +98,18 @@ uint64_t Signal::GetNumberOfStrings()
 {
     return m_strings;
 };
+
+// Set number of colomns
+void Signal::SetNumberOfColomns(uint64_t colomns)
+{
+    m_colomns = colomns;
+}
+
+// Set number of strings
+void Signal::SetNumberOfStrings(uint64_t strings)
+{
+    m_strings = strings;
+}
 
 // Get data array
 std::complex<double>** Signal::GetDataArray()

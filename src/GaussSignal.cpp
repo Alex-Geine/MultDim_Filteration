@@ -9,80 +9,63 @@ GaussSignal::GaussSignal(){};
 GaussSignal::~GaussSignal(){};
 
 // Copy constructor
-GaussSignal::GaussSignal(const GaussSignal& sig)
-{
-
-};
+GaussSignal::GaussSignal(const GaussSignal& sig) : Signal(sig){};
 
 // Move constructor
-GaussSignal::GaussSignal(GaussSignal&& sig)
-{
-
-};
+GaussSignal::GaussSignal(GaussSignal&& sig) : Signal(sig){};
 
 // Copy operator
 GaussSignal GaussSignal::operator=(const GaussSignal& sig)
 {
+    Signal::operator=(sig);
+
     return *this;
 };
 
 // Move operator
 GaussSignal GaussSignal::operator=(GaussSignal&& sig)
 {
+    Signal::operator=(sig);
+
     return *this;
 };
 
-// Get number of colomns
-uint64_t GaussSignal::GetNumberOfColomns()
-{
-    return m_colomns;
-};
-
-// Get number if strings
-uint64_t GaussSignal::GetNumberOfStrings()
-{
-    return m_strings;
-};
-
-// Get data array
-std::complex<double>** GaussSignal::GetDataArray()
-{
-    return m_dataArray;
-};
-
-// GaussSignal methods
-
 // Constructor
-GaussSignal::GaussSignal ( uint64_t colomns, uint64_t strings, uint64_t numberOfGauss,
+GaussSignal::GaussSignal ( uint64_t numberOfGauss,
                            double* x0Array, double* y0Array,  double* amplArray,
-                           double* sigmaXArray, double* sigmaYArray )
+                           double* sigmaXArray, double* sigmaYArray ) : Signal(N, N)
 {
+    if ((numberOfGauss != 0))
+    {
+        std::complex<double>** data  = Signal::GetDataArray();
+        double                 left  = -0.5;
+        double                 right = 0.5;
+        double                 top   = right;
+        double                 bot   = left;
+        double                 dx    = (right - left) / (double)N;
+        double                 dy    = (top - bot) / (double)N;
+        double                 x     = left;
+        double                 y     = bot;
 
-};
+        for (uint64_t i = 0; i < N; ++i)
+        {
+            for (uint64_t j = 0; j < N; ++j)
+            {
+                 for (uint64_t k = 0; k < numberOfGauss; ++k)
+                     data[i][j].real(Gauss(x, y, amplArray[k], x0Array[k], y0Array[k], sigmaXArray[k], sigmaYArray[k]));
 
-// Delete other arrays
-void GaussSignal::DeleteOtherArrays()
-{
-    if (m_x0Array != nullptr)
-        delete[] m_x0Array;
+                 y += dy;
+            }
 
-    if (m_y0Array != nullptr)
-        delete[] m_y0Array;
-
-    if (m_amplArray != nullptr)
-        delete[] m_amplArray;
-
-    if (m_sigmaXArray != nullptr)
-        delete[] m_sigmaXArray;
-
-    if (m_sigmaYArray != nullptr)
-        delete[] m_sigmaYArray;
+            x += dx;
+        }
+    }
 };
 
 // Gauss function
-double GaussSignal::Gauss(uint64_t idFunc)
+double GaussSignal::Gauss(double x, double y, double ampl, double x0, double y0, double xSigma, double ySigma)
 {
-    return 0;
+   return ampl * exp(- ( (x - x0) * (x - x0) / (xSigma * xSigma) + (y - y0) * (y - y0) / (ySigma * ySigma)));
 };
 
 
