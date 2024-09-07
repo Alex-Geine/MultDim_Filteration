@@ -216,3 +216,82 @@ bool g_noizeSignal(const Signal& sig, double Db)
 
     return true;
 };
+
+// Filtration function
+Signal* g_squareFiltration(const Signal& sig, double Db)
+{
+    if (Db >= 0)
+        Db = 0;
+
+    Signal* filteredSignal = new Signal(sig);
+
+    std::complex<double>** realSigData     = sig.GetDataArray();
+    std::complex<double>** filteredSigData = filteredSignal.GetDataArray();
+    std::complex<double>   deletedValue    = realSigData[0][0];
+
+    // Delete first point
+    realSigData[0][0].real(0);
+    realSigData[0][0].imag(0);
+    filteredSigData[0][0].real(0);
+    filteredSigData[0][0].imag(0);
+
+    double   persent = 0.01;
+    uint64_t strings = sig.GetNumberOfStrings();
+    uint64_t colomns = sig.GetNumberOfColomns();
+    uint64_t centIdx = strings / 2;
+    uint64_t centIdy = colomns / 2;
+    uint64_t idx     = centIdx;
+    uint64_t idy     = centIdy;
+    uint64_t dIdx    = (double)strings / (double)2 * persent;
+    uint64_t dIdy    = (double)colomns / (double)2 * persent;
+
+    if (dIdx == 0)
+        dIdx = 1;
+    if (dIdy == 0)
+        dIdy = 1;
+
+    double energyRealSig = sig.GetEnergy();
+    double energyFiltSig = sig.GetEnerdy();
+
+    uint64_t newIdx = 0;
+    uint64_t newIdy = 0;
+
+    // Processing filtration
+    while (Db > 10 * std::log10(energyFiltSig / energyRealSig))
+    {
+        if ((idx <= dIdx) && (idy <= dIdy))
+        {
+            realSigData[0][0]     = deletedValue;
+            filteredSigData[0][0] = deletedValue;
+
+            return filteredSignal;
+        }
+
+        newIdx = idx - dIdx;
+        newIdy = idy - dIdy;
+       // Мы эотим занулять все по линиям, все должно расходиться от цетральной к остальным
+        for (uint64_t i = newIdx; i < idx; ++i)
+        {
+            for (uint64_t j = newIdy; j < idy; ++j)
+            {
+                // Left top
+                filteredSigData[i][j].real(0);
+                filteredSigData[i][j].imag(0);
+
+                // Right top
+                filteredSigData[centIdx + (idx - i)][centIdy + (idy - j)].real(0);
+                filteredSigData[centIdx + (isx - i)][centIdy + (idy - j)].imag(0);
+
+                // Left bot
+                filteredSigData[centIdx - (idx - i)][centIdy - (idy - j)].real(0);
+                filteredSigData[centIdx - (isx - i)][centIdy - (idy - j)].imag(0);
+
+                // Right top
+                filteredSigData[centIdx + (idx - i)][centIdy + (idy - j)].real(0);
+                filteredSigData[centIdx + (isx - i)][centIdy + (idy - j)].imag(0);
+            }
+        }
+    }
+
+    return filteredSignal;
+};
