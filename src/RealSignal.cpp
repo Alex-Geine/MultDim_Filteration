@@ -6,7 +6,7 @@
 RealSignal::RealSignal(){};
 
 // Default destructor
-~RealSignal::RealSignal(){};
+RealSignal::~RealSignal(){};
 
 // Copy constructor
 RealSignal::RealSignal(const RealSignal& sig)
@@ -15,19 +15,19 @@ RealSignal::RealSignal(const RealSignal& sig)
 };
 
 // Move constructor
-RealSignal::RealSignal(const RealSignal& sig)
+RealSignal::RealSignal(RealSignal&& sig)
 {
 
 };
 
 // Copy operator
-RealSignal::RealSignal operator=(const RealSignal& sig)
+RealSignal RealSignal::operator=(const RealSignal& sig)
 {
     return *this;
 };
 
 // Move operator
-RealSignal::RealSignal operator=(const RealSignal& sig)
+RealSignal RealSignal::operator=(RealSignal&& sig)
 {
     return *this;
 };
@@ -45,7 +45,7 @@ uint64_t RealSignal::GetNumberOfStrings()
 };
 
 // Get data array
-cmplx<double>** RealSignal::GetDataArray()
+std::complex<double>** RealSignal::GetDataArray()
 {
     return m_dataArray;
 };
@@ -53,19 +53,19 @@ cmplx<double>** RealSignal::GetDataArray()
 // RealSignal methods
 
 // Constructor
-RealSignal::RealSignal(cmplx<double>** dataArray, uint64_t colomns, uint64_t strings)
+RealSignal::RealSignal(std::complex<double>** dataArray, uint64_t colomns, uint64_t strings)
 {
 
 };
 
 // Get nnumber of actual colomns
-uint64_t GetActualNumberOfColomns()
+uint64_t RealSignal::GetActualNumberOfColomns()
 {
     return m_actualColomns;
 };
 
 // Get number of actual strings
-uint64_t GetActualNumberOfStrings()
+uint64_t RealSignal::GetActualNumberOfStrings()
 {
     return m_actualStrings;
 };

@@ -1,5 +1,5 @@
-CMakeFiles/signal.dir/src/GaussSignal.cpp.o: \
- /mnt/i/projects/multiDimProcessing/multiDimFiltration/MultDim_Filteration/src/GaussSignal.cpp \
+CMakeFiles/signal.dir/src/TestSignal.cpp.o: \
+ /mnt/i/projects/multiDimProcessing/multiDimFiltration/MultDim_Filteration/src/TestSignal.cpp \
  /usr/include/stdc-predef.h \
  /mnt/i/projects/multiDimProcessing/multiDimFiltration/MultDim_Filteration/inc/Signal.h \
  /usr/include/c++/11/iostream \

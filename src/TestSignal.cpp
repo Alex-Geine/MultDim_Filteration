@@ -6,7 +6,7 @@
 TestSignal::TestSignal(){};
 
 // Default destructor
-~TestSignal::TestSignal(){};
+TestSignal::~TestSignal(){};
 
 // Copy condtructor
 TestSignal::TestSignal(const TestSignal& sig)
@@ -15,19 +15,19 @@ TestSignal::TestSignal(const TestSignal& sig)
 };
 
 // Move constructor
-TestSignal::TestSignal(const TestSignal& sig)
+TestSignal::TestSignal(TestSignal&& sig)
 {
 
 };
 
 // Copy operator
-TestSignal::TestSignal operator=(const TestSignal& sig)
+TestSignal TestSignal::operator=(const TestSignal& sig)
 {
     return *this;
 };
 
 // Move operator
-TestSignal::TestSignal operator=(const TestSignal&& sig)
+TestSignal TestSignal::operator=(TestSignal&& sig)
 {
     return *this;
 };
@@ -45,7 +45,7 @@ uint64_t TestSignal::GetNumberOfStrings()
 };
 
 // Get data array
-cmplx<double>** TestSignal::GetDataArray()
+std::complex<double>** TestSignal::GetDataArray()
 {
     return m_dataArray;
 };

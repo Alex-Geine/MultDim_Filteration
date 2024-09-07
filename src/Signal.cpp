@@ -6,28 +6,28 @@
 Signal::Signal(){};
 
 // Default destructor
-~Signal()
+Signal::~Signal()
 {
     DeleteDataArray();
 };
 
 // Copy constructor
-Signal::Signal(conts Signal& sig)
+Signal::Signal(const Signal& sig)
 {
     m_colomns = sig.m_colomns;
     m_strings = sig.m_strings;
 
-    m_dataArray = new cmplx<double>*[m_strings];
+    m_dataArray = new std::complex<double>*[m_strings];
     for (uint64_t i = 0; i < m_strings; ++i)
     {
-        m_dataArray[i] = new cmplx<double>[m_colomns];
+        m_dataArray[i] = new std::complex<double>[m_colomns];
         for (uint64_t j = 0; j < m_colomns; ++j)
             m_dataArray[i][j] = sig.m_dataArray[i][j];
     }
 };
 
 // Move constructor
-Signal::Signal(const Signal&& sig)
+Signal::Signal(Signal&& sig)
 {
     m_colomns   = sig.m_colomns;
     m_strings   = sig.m_strings;
@@ -37,9 +37,9 @@ Signal::Signal(const Signal&& sig)
 };
 
 // Copy operator
-Signal::Signal operator=(const Signal& sig)
+Signal Signal::operator=(const Signal& sig)
 {
-    if (*this == sig)
+    if (this == &sig)
         return *this;
 
     m_colomns = sig.m_colomns;
@@ -47,10 +47,10 @@ Signal::Signal operator=(const Signal& sig)
 
     DeleteDataArray();
 
-    m_dataArray = new cmplx<double>*[m_strings];
+    m_dataArray = new std::complex<double>*[m_strings];
     for (uint64_t i = 0; i < m_strings; ++i)
     {
-        m_dataArray[i] = new cmplx<double>[m_colomns];
+        m_dataArray[i] = new std::complex<double>[m_colomns];
         for (uint64_t j = 0; j < m_colomns; ++j)
             m_dataArray[i][j] = sig.m_dataArray[i][j];
     }
@@ -59,9 +59,9 @@ Signal::Signal operator=(const Signal& sig)
 };
 
 // Move operator
-Signal::Signal operator=(const Signal&& sig)
+Signal Signal::operator=(Signal&& sig)
 {
-    if (*this == sig)
+    if (this == &sig)
         return *this;
 
     m_colomns = sig.m_colomns;
@@ -88,7 +88,7 @@ uint64_t Signal::GetNumberOfStrings()
 };
 
 // Get data array
-cmplx<double>** Signal::GetDataArray()
+std::complex<double>** Signal::GetDataArray()
 {
     return m_dataArray;
 };

@@ -6,7 +6,7 @@
 GaussSignal::GaussSignal(){};
 
 // Default destructor
-~GaussSignal::GaussSignal(){};
+GaussSignal::~GaussSignal(){};
 
 // Copy constructor
 GaussSignal::GaussSignal(const GaussSignal& sig)
@@ -15,19 +15,19 @@ GaussSignal::GaussSignal(const GaussSignal& sig)
 };
 
 // Move constructor
-GaussSignal::GaussSignal(const GaussSignal&& sig)
+GaussSignal::GaussSignal(GaussSignal&& sig)
 {
 
 };
 
 // Copy operator
-GaussSignal::GaussSignal operator=(const GaussSignal& sig)
+GaussSignal GaussSignal::operator=(const GaussSignal& sig)
 {
     return *this;
 };
 
 // Move operator
-GaussSignal::GaussSignal operator=(const GaussSignal&& sig)
+GaussSignal GaussSignal::operator=(GaussSignal&& sig)
 {
     return *this;
 };
@@ -45,7 +45,7 @@ uint64_t GaussSignal::GetNumberOfStrings()
 };
 
 // Get data array
-cmplx<double>** GaussSignal::GetDataArray()
+std::complex<double>** GaussSignal::GetDataArray()
 {
     return m_dataArray;
 };
@@ -54,7 +54,7 @@ cmplx<double>** GaussSignal::GetDataArray()
 
 // Constructor
 GaussSignal::GaussSignal ( uint64_t colomns, uint64_t strings, uint64_t numberOfGauss,
-                           double x0Array, double* y0Array,  double* amplArray,
+                           double* x0Array, double* y0Array,  double* amplArray,
                            double* sigmaXArray, double* sigmaYArray )
 {
 
@@ -82,7 +82,7 @@ void GaussSignal::DeleteOtherArrays()
 // Gauss function
 double GaussSignal::Gauss(uint64_t idFunc)
 {
-
+    return 0;
 };
 
 

@@ -11,7 +11,7 @@ class Signal
 
     uint64_t        m_colomns   = 0;          //!< Number of colomns in matrix
     uint64_t        m_strings   = 0;          //!< Number of strings in matrix
-    cmplx<double>** m_dataArray = nullptr;    //!< Array with points
+    std::complex<double>** m_dataArray = nullptr;    //!< Array with points
 
     private:    // methods
 
@@ -27,16 +27,16 @@ class Signal
     ~Signal();
 
     // Copy constructor
-    Signal(const Singal& sig);
+    Signal(const Signal& sig);
 
     // Move constructor
-    Signal(const Signal&& sig);
+    Signal(Signal&& sig);
 
     // Copy operator
     Signal operator=(const Signal& sig);
 
     // Move operator
-    Signal operator=(const Signal&& sig);
+    Signal operator=(Signal&& sig);
 
     // Get number of colomns
     uint64_t GetNumberOfColomns();
@@ -45,8 +45,8 @@ class Signal
     uint64_t GetNumberOfStrings();
 
     // Get data array
-    cmplx<double>** GetDataArray();
-}
+    std::complex<double>** GetDataArray();
+};
 
 // Class witch representation Gauss signal
 class GaussSignal : public Signal
@@ -55,7 +55,7 @@ class GaussSignal : public Signal
 
     uint64_t        m_colomns       = 0;            //!< Number of colomns in matrix
     uint64_t        m_strings       = 0;            //!< Number of strings in matrix
-    cmplx<double>** m_dataArray     = nullptr;      //!< Array with points
+    std::complex<double>** m_dataArray     = nullptr;      //!< Array with points
 
     uint64_t        m_numberOfGauss = 0;            //!< Number of Gauss functions in signal
     double*         m_x0Array       = nullptr;      //!< Array with x0 values of centers of functions
@@ -84,16 +84,16 @@ class GaussSignal : public Signal
     ~GaussSignal();
 
     // Copy constructor
-    GaussSignal(const GaussSingal& sig);
+    GaussSignal(const GaussSignal& sig);
 
     // Move constructor
-    GaussSignal(const GaussSignal&& sig);
+    GaussSignal(GaussSignal&& sig);
 
     // Copy operator
-    GaussSingal operator=(const GaussSignal& sig);
+    GaussSignal operator=(const GaussSignal& sig);
 
     // Move operator
-    GaussSignal operator=(const GaussSignal&& sig);
+    GaussSignal operator=(GaussSignal&& sig);
 
     // Get number of colomns
     uint64_t GetNumberOfColomns();
@@ -102,7 +102,7 @@ class GaussSignal : public Signal
     uint64_t GetNumberOfStrings();
 
     // Get data array
-    cmplx<double>** GetDataArray();
+    std::complex<double>** GetDataArray();
 
     // GaussSignal methods
 
@@ -110,7 +110,7 @@ class GaussSignal : public Signal
     GaussSignal( uint64_t colomns, uint64_t strings, uint64_t numberOfGauss,
                  double* x0Array, double* y0Array, double* amplArray,
                  double* sigmaXArray, double* sigmaYArray );
-}
+};
 
 // Class whitch representation test signal (square)
 class TestSignal : public Signal
@@ -119,7 +119,7 @@ class TestSignal : public Signal
 
     uint64_t        m_colomns   = 0;          //!< Number of colomns in matrix
     uint64_t        m_strings   = 0;          //!< Number of strings in matrix
-    cmplx<double>** m_dataArray = nullptr;    //!< Array with points
+    std::complex<double>** m_dataArray = nullptr;    //!< Array with points
 
     double          weight      = 0;          //!< Weight value for square signal
     double          heighth     = 0;          //!< Height value for squate signal
@@ -138,16 +138,16 @@ class TestSignal : public Signal
     ~TestSignal();
 
     // Copy constructor
-    TestSignal(const TestSingal& sig);
+    TestSignal(const TestSignal& sig);
 
     // Move constructor
-    TestSignal(const TestSignal&& sig);
+    TestSignal(TestSignal&& sig);
 
     // Copy operator
-    TestSingal operator=(const TestSignal& sig);
+    TestSignal operator=(const TestSignal& sig);
 
     // Move operator
-    TestSignal operator=(const TestSignal&& sig);
+    TestSignal operator=(TestSignal&& sig);
 
     // Get number of colomns
     uint64_t GetNumberOfColomns();
@@ -156,13 +156,13 @@ class TestSignal : public Signal
     uint64_t GetNumberOfStrings();
 
     // Get data array
-    cmplx<double>** GetDataArray();
+    std::complex<double>** GetDataArray();
 
     // Test signal methods
 
     // Constructor
     TestSignal(double weight, double height);
-}
+};
 
 class RealSignal : public Signal
 {
@@ -170,7 +170,7 @@ class RealSignal : public Signal
 
     uint64_t        m_colomns       = 0;          //!< Number of colomns in matrix
     uint64_t        m_strings       = 0;          //!< Number of strings in matrix
-    cmplx<double>** m_dataArray     = nullptr;    //!< Array with points
+    std::complex<double>** m_dataArray     = nullptr;    //!< Array with points
 
     uint64_t        m_actualColomns = 0;          //!< Number of colomns of resized signal
     uint64_t        m_actualStrings = 0;          //!< Number of strings of resized signal
@@ -192,13 +192,13 @@ class RealSignal : public Signal
     RealSignal(const RealSignal& sig);
 
     // Move constructor
-    RealSignal(const RealSignal&& sig);
+    RealSignal(RealSignal&& sig);
 
     // Copy operator
-    RealSingal operator=(const RealSignal& sig);
+    RealSignal operator=(const RealSignal& sig);
 
     // Move operator
-    RealSignal operator=(const RealSignal&& sig);
+    RealSignal operator=(RealSignal&& sig);
 
     // Get number of colomns
     uint64_t GetNumberOfColomns();
@@ -207,19 +207,25 @@ class RealSignal : public Signal
     uint64_t GetNumberOfStrings();
 
     // Get data array
-    cmplx<double>** GetDataArray();
+    std::complex<double>** GetDataArray();
 
     // Real signal methods
 
     // Constructor
-    RealSignal(cmplx<double>** dataArray, uint64_t colomns, uint64_t strings);
-}
+    RealSignal(std::complex<double>** dataArray, uint64_t colomns, uint64_t strings);
+
+    // Get number of actual colomns
+    uint64_t GetActualNumberOfColomns();
+
+    // Get number of actual strings
+    uint64_t GetActualNumberOfStrings();
+};
 
 // Multidimensional Furie
-bool g_MFFT(cmplx<double>** inData, cmplx<double>** outData, uint64_t size, bool flag);
+bool g_MFFT(std::complex<double>** inData, std::complex<double>** outData, uint64_t size, bool flag);
 
 // FFT
-bool g_FFT(cmplx<double>* inData, cmplx<double>* outData, uint64_t size, bool flag);
+bool g_FFT(std::complex<double>* inData, std::complex<double>* outData, uint64_t size, bool flag);
 
 // Noize function
 bool g_NoizeSignal(const Signal& sig, double Db);
