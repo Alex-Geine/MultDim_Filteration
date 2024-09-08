@@ -185,9 +185,9 @@ bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint6
 bool g_fft(std::complex<double>* inData, std::complex<double>* outData, uint64_t size, uint64_t flag);
 
 // Noize function
-bool g_noizeSignal(const Signal& sig, double Db);
+bool g_noizeSignal(Signal& sig, double Db);
 
 // Filtration function
-Signal* g_squareFiltration(const Signal& sig, double Db);
+Signal* g_squareFiltration(Signal& sig, double Db);
 
 #endif    // SIGNAL_H

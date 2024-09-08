@@ -18,11 +18,11 @@ bool g_fft(std::complex<double>** inData, std::complex<double>* outData, uint64_
     // Output data
     for (uint64_t i = 0; i < size; ++i)
     {
-        outData[i].real(inData[i].real());
-        outData[i].imag(inData[i].imag());
+        outData[i].real(inData[i]->real());
+        outData[i].imag(inData[i]->imag());
     }
 
-    register uint64_t  i, j, n, k, io, ie, in, nn;
+    uint64_t  i, j, n, k, io, ie, in, nn;
     double         ru, iu, rtp, itp, rtq, itq, rw, iw, sr;
 
     static const double Rcoef[14] =
@@ -60,10 +60,10 @@ bool g_fft(std::complex<double>** inData, std::complex<double>* outData, uint64_
             for (i = j; i < size; i += ie)
             {
                 io       = i + in;
-                rtp      = Rdat[i]  + Rdat[io];
-                itp      = Idat[i]  + Idat[io];
-                rtq      = Rdat[i]  - Rdat[io];
-                itq      = Idat[i]  - Idat[io];
+                rtp      = outData[i].real()  + outData[io].real();
+                itp      = outData[i].imag()  + outData[io].imag();
+                rtq      = outData[i].real()  - outData[io].real();
+                itq      = outData[i].imag()  - outData[io].imag();
 
                 outData[io].real(rtq * ru - itq * iu);
                 outData[io].imag(itq * ru + rtq * iu);
@@ -85,10 +85,10 @@ bool g_fft(std::complex<double>** inData, std::complex<double>* outData, uint64_
         {
             io       = i - 1;
             in       = j - 1;
-            rtp      = Rdat[in];
-            itp      = Idat[in];
+            rtp      = outData[in].real();
+            itp      = outData[in].imag();
 
-            outData[in].real(Rdat[io].real());
+            outData[in].real(outData[io].real());
             outData[in].imag(outData[io].imag());
             outData[io].real(rtp);
             outData[io].imag(itp);
@@ -135,7 +135,7 @@ bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint6
     // Strings
     for (uint64_t i = 0; i < strings; ++i)
     {
-        res = g_FFT(inData[i], outData[i], strings, flag);
+        res = g_fft(inData[i], outData[i], strings, flag);
 
         if ( !res )
         {
@@ -155,7 +155,7 @@ bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint6
             colDataIn[j].imag(inData[j][i].imag());
         }
 
-        res = g_FFT(colDataIn, colDataOut, colomns, flag);
+        res = g_fft(colDataIn, colDataOut, colomns, flag);
 
         if ( !res )
         {
@@ -172,8 +172,8 @@ bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint6
         }
     }
 
-    delete[] colData;
-    delete[] strData;
+    delete[] colDataIn;
+    delete[] colDataOut;
 
     return true;
 };
@@ -186,11 +186,11 @@ double g_random()
     for (uint64_t i = 0; i < 12; ++i)
         res += -1. + 2 * (double)std::rand() / RAND_MAX;
 
-    return a;
+    return res;
 };
 
 // Noize function
-bool g_noizeSignal(const Signal& sig, double Db)
+bool g_noizeSignal(Signal& sig, double Db)
 {
     uint64_t colomns = sig.GetNumberOfColomns();
     uint64_t strings = sig.GetNumberOfStrings();
@@ -207,8 +207,8 @@ bool g_noizeSignal(const Signal& sig, double Db)
             noiseData[i][j].real(g_random());
 
     double energySig   = sig.GetEnergy();
-    double energyNoise = noise.GetEnery();
-    double koef        = energySig / energyNoise * (std::pow(10, Db / 10);
+    double energyNoise = noise.GetEnergy();
+    double koef        = energySig / energyNoise * (std::pow(10, Db / 10));
 
     for (uint64_t i = 0; i < strings; ++i)
          for (uint64_t j = 0; j < colomns; ++j)
@@ -218,7 +218,7 @@ bool g_noizeSignal(const Signal& sig, double Db)
 };
 
 // Filtration function
-Signal* g_squareFiltration(const Signal& sig, double Db)
+Signal* g_squareFiltration(Signal& sig, double Db)
 {
     if (Db >= 0)
         Db = 0;
@@ -226,7 +226,7 @@ Signal* g_squareFiltration(const Signal& sig, double Db)
     Signal* filteredSignal = new Signal(sig);
 
     std::complex<double>** realSigData     = sig.GetDataArray();
-    std::complex<double>** filteredSigData = filteredSignal.GetDataArray();
+    std::complex<double>** filteredSigData = filteredSignal->GetDataArray();
     std::complex<double>   deletedValue    = realSigData[0][0];
 
     // Delete first point
@@ -238,12 +238,12 @@ Signal* g_squareFiltration(const Signal& sig, double Db)
     double   persent = 0.01;
     uint64_t strings = sig.GetNumberOfStrings();
     uint64_t colomns = sig.GetNumberOfColomns();
-    uint64_t centIdx = strings / 2;
-    uint64_t centIdy = colomns / 2;
+    uint64_t centIdx = colomns / 2;
+    uint64_t centIdy = strings / 2;
     uint64_t idx     = centIdx;
     uint64_t idy     = centIdy;
-    uint64_t dIdx    = (double)strings / (double)2 * persent;
-    uint64_t dIdy    = (double)colomns / (double)2 * persent;
+    uint64_t dIdx    = (double)colomns / (double)2 * persent;
+    uint64_t dIdy    = (double)strings / (double)2 * persent;
 
     if (dIdx == 0)
         dIdx = 1;
@@ -251,7 +251,7 @@ Signal* g_squareFiltration(const Signal& sig, double Db)
         dIdy = 1;
 
     double energyRealSig = sig.GetEnergy();
-    double energyFiltSig = sig.GetEnerdy();
+    double energyFiltSig = sig.GetEnergy();
 
     uint64_t newIdx = 0;
     uint64_t newIdy = 0;
@@ -269,29 +269,44 @@ Signal* g_squareFiltration(const Signal& sig, double Db)
 
         newIdx = idx - dIdx;
         newIdy = idy - dIdy;
-       // Мы эотим занулять все по линиям, все должно расходиться от цетральной к остальным
-        for (uint64_t i = newIdx; i < idx; ++i)
+
+        // Colomns
+        for (uint64_t i = 0; i < strings; ++i)
         {
             for (uint64_t j = newIdy; j < idy; ++j)
             {
-                // Left top
+                // Left
                 filteredSigData[i][j].real(0);
                 filteredSigData[i][j].imag(0);
 
-                // Right top
-                filteredSigData[centIdx + (idx - i)][centIdy + (idy - j)].real(0);
-                filteredSigData[centIdx + (isx - i)][centIdy + (idy - j)].imag(0);
-
-                // Left bot
-                filteredSigData[centIdx - (idx - i)][centIdy - (idy - j)].real(0);
-                filteredSigData[centIdx - (isx - i)][centIdy - (idy - j)].imag(0);
-
-                // Right top
-                filteredSigData[centIdx + (idx - i)][centIdy + (idy - j)].real(0);
-                filteredSigData[centIdx + (isx - i)][centIdy + (idy - j)].imag(0);
+                //Right
+                filteredSigData[i][centIdy + (centIdy - j)].real(0);
+                filteredSigData[i][centIdy + (centIdy - j)].imag(0);
             }
         }
+
+        // Strings
+        for (uint64_t i = 0; i < colomns; ++i)
+        {
+            for (uint64_t j = newIdx; j < idx; ++j)
+            {
+                // Bot
+                filteredSigData[j][i].real(0);
+                filteredSigData[j][i].imag(0);
+
+                // Top
+                filteredSigData[centIdx + (centIdx - j)][i].real(0);
+                filteredSigData[centIdx + (centIdx - j)][i].imag(0);
+            }
+        }
+
+
+        idx -= dIdx;
+        idy -= dIdy;
     }
+
+    realSigData[0][0]     = deletedValue;
+    filteredSigData[0][0] = deletedValue;
 
     return filteredSignal;
 };
