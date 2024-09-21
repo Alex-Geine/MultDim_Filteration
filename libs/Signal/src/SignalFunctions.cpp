@@ -1,9 +1,9 @@
-#include <Signal.h>
+#include "Signal.h"
 
 // Signal functions
 
 // FFT
-bool g_fft(std::complex<double>** inData, std::complex<double>* outData, uint64_t size, uint64_t flag)
+bool g_fft(std::complex<double>* inData, std::complex<double>* outData, uint64_t size, uint64_t flag)
 {
     // Prepare data
     uint64_t logN = std::log2(size);
@@ -18,8 +18,8 @@ bool g_fft(std::complex<double>** inData, std::complex<double>* outData, uint64_
     // Output data
     for (uint64_t i = 0; i < size; ++i)
     {
-        outData[i].real(inData[i]->real());
-        outData[i].imag(inData[i]->imag());
+        outData[i].real(inData[i].real());
+        outData[i].imag(inData[i].imag());
     }
 
     uint64_t  i, j, n, k, io, ie, in, nn;

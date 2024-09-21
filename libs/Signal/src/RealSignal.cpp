@@ -45,21 +45,22 @@ RealSignal RealSignal::operator=(RealSignal&& sig)
 };
 
 // Constructor
-RealSignal::RealSignal(std::complex<double>** dataArray, uint64_t colomns, uint64_t strings) : Signal(PowersOfTwo(colomns), PowersOfTwo(strings))
+RealSignal::RealSignal(uint8_t* dataArray, uint64_t colomns, uint64_t strings) : Signal(PowersOfTwo(colomns), PowersOfTwo(strings))
 {
     if ((colomns != 0) && (strings != 0) && (dataArray != nullptr))
     {
         m_actualColomns = colomns;
         m_actualStrings = strings;
-
+     
+        uint64_t size = colomns * strings;
+        
         colomns = Signal::GetNumberOfColomns();
         strings = Signal::GetNumberOfStrings();
 
         std::complex<double>** data = Signal::GetDataArray();
 
-        for (uint64_t i = 0; i < strings; ++i)
-            for (uint64_t j = 0; j < colomns; ++j)
-                data[i][j].real(dataArray[i][j].real());
+        for (uint64_t i = 0; i < size; ++i)        
+            data[i / colomns][i % colomns].real(dataArray[i]);
     }
 };
 
@@ -92,4 +93,3 @@ void RealSignal::Resize()
     Signal::SetNumberOfColomns(m_actualColomns);
     Signal::SetNumberOfStrings(m_actualStrings);
 };
-

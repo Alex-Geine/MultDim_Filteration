@@ -1,4 +1,4 @@
-#include <Signal.h>
+#include "Signal.h"
 
 // class GaussSignal
 

@@ -66,6 +66,9 @@ class Signal
 
     // Get data array
     std::complex<double>** GetDataArray();
+
+    // Get picture array
+    uint8_t* GetPictureArray();
 };
 
 // Class witch representation Gauss signal
@@ -166,7 +169,7 @@ class RealSignal : public Signal
     RealSignal operator=(RealSignal&& sig);
 
     // Constructor
-    RealSignal(std::complex<double>** dataArray, uint64_t colomns, uint64_t strings);
+    RealSignal(uint8_t* dataArray, uint64_t colomns, uint64_t strings);
 
     // Get number of actual colomns
     uint64_t GetActualNumberOfColomns();
