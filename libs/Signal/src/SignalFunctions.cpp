@@ -135,7 +135,7 @@ bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint6
     // Strings
     for (uint64_t i = 0; i < strings; ++i)
     {
-        res = g_fft(inData[i], outData[i], strings, flag);
+        res = g_fft(inData[i], outData[i], colomns, flag);
 
         if ( !res )
         {
@@ -147,30 +147,30 @@ bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint6
     }
 
     // Colomns
-    for (uint64_t i = 0; i < colomns; ++i)
-    {
-        for (uint64_t j = 0; j < strings; ++j)
-        {
-            colDataIn[j].real(inData[j][i].real());
-            colDataIn[j].imag(inData[j][i].imag());
-        }
+   // for (uint64_t i = 0; i < colomns; ++i)
+    //{
+    //    for (uint64_t j = 0; j < strings; ++j)
+    //    {
+    //        colDataIn[j].real(outData[j][i].real());
+    //        colDataIn[j].imag(outData[j][i].imag());
+    //    }
 
-        res = g_fft(colDataIn, colDataOut, colomns, flag);
+     //   res = g_fft(colDataIn, colDataOut, colomns, flag);
 
-        if ( !res )
-        {
-            delete[] colDataIn;
-            delete[] colDataOut;
+      //  if ( !res )
+      //  {
+      //      delete[] colDataIn;
+      //      delete[] colDataOut;
 
-            return false;
-        }
+//            return false;
+  //      }
 
-        for (uint64_t j = 0; j < strings; ++j)
-        {
-            outData[j][i].real(colDataOut[i].real());
-            outData[j][i].imag(colDataOut[i].imag());
-        }
-    }
+    //    for (uint64_t j = 0; j < strings; ++j)
+      //  {
+        //    outData[j][i].real(colDataOut[i].real());
+      //      outData[j][i].imag(colDataOut[i].imag());
+      //  }
+   // }
 
     delete[] colDataIn;
     delete[] colDataOut;
