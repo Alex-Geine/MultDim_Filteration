@@ -37,13 +37,12 @@ TestSignal::TestSignal(double weight) : Signal(N ,N)
     {
         std::complex<double>** data = GetDataArray();
 
-        double                 left  = -0.5;
-        double                 rigth = 0.5;
-        double                 top   = 0.5;
-        double                 bot   = -0.5;
+        uint64_t l = uint64_t(double(N) * weight / (double)100);
 
-        uint64_t               idxMax  = uint64_t(double(N) * weight / (double)100);
-        uint64_t               idxMin  = N - idxMax;
+        std::cout << "l: " << l << ", N: " << N <<  std::endl;
+
+        uint64_t               idxMax  = l + (N - l) / 2;
+        uint64_t               idxMin  = (N - l) / 2;
         uint64_t               idyMax  = idxMax;
         uint64_t               idyMin  = idxMin;
 
@@ -51,12 +50,11 @@ TestSignal::TestSignal(double weight) : Signal(N ,N)
 
         for (uint64_t i = idxMin; i < idxMax; ++i)
             for (uint64_t j = idyMin; j < idyMax; ++j)
-                data[i][j].real(255);
+                data[i][j] = std::complex<double>{255, 0};
 
         //for (uint64_t i = 0; i < N * N; ++i)
-        //    std::cout << std::abs(data[i / N][i % N]) << std::endl;
+        //     std::cout << std::abs(data[i / N][i % N]) << " " << std::endl;
 
-        std::cout << std::endl;
     }
 };
 

@@ -18,7 +18,18 @@ bool g_safeImage(std::string name, uint32_t width, uint32_t height, uint8_t* dat
 {
     Image image;
 
-    image.read((size_t)width, (size_t)height, "BRG", CharPixel, (void*)data);
+    uint64_t counter = 0;
+    for (uint64_t i = 0; i < height; ++i)
+    {
+        for (uint64_t j = 0; j < width * 3; ++j)
+        {
+            std::cout << (uint32_t)data[counter] << " ";
+            counter++;
+        }
+        std::cout << std::endl;
+    }
+
+    image.read(width, height, "BRG", CharPixel, data);
     image.write("Test.bmp");
 
     return true;

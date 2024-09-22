@@ -4,11 +4,17 @@
 void printData(uint8_t* data, uint32_t col, uint32_t str)
 {
      std::cout << "printing data..." << std::endl;
-        for (uint64_t i = 0; i < col * str; ++i)
-        {
-           std::cout << (uint32_t)data[i] << " ";
-        }
-        std::cout << std::endl;
+     uint64_t counter = 0;
+     for (uint64_t i = 0; i < str; ++i)
+     {
+         for (uint64_t j = 0; j < col; ++j)
+         {
+             std::cout << (uint32_t)data[counter] << " ";
+             counter++;
+         }
+         std::cout << std::endl;
+     }
+     std::cout << std::endl;
 };
 
 int main(int argc,char **argv)
@@ -16,19 +22,21 @@ int main(int argc,char **argv)
     InitializeMagick(*argv);
     uint32_t col = N;
     uint32_t str = N;
-    double weight = 10;
+    double weight = 50;
 
     Signal* testSig = new TestSignal(weight);
 
-    double En = testSig->GetEnergy();
+    //double En = testSig->GetEnergy();
 
-    uint8_t* data = testSig->GetPicture();
-    uint8_t* pic  = new uint8_t[col * str * 3];
+     uint8_t* data = testSig->GetPicture();
+     uint8_t* pic  = new uint8_t[col * str * 3];
 
      printData(data, col, str);
 
-     //g_toGrayScaleOut(col, str, data, pic);
-     //g_safeImage(std::string("f"), col, str, pic);
+     g_toGrayScaleOut(col, str, data, pic);
+     printData(pic, col * 3, str);
+
+     g_safeImage(std::string("f"), col, str, pic);
 
      //std::string name("not-gnature.bmp");
      //uint32_t width  = 0;

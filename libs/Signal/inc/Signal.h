@@ -7,7 +7,7 @@
 #include <time.h>
 
 
-#define  N                      512                          // Base dimension of signal
+#define  N                      10//512                          // Base dimension of signal
 #define  NUMBER_IS_2_POW_K(x)   ((!((x)&((x)-1)))&&((x)>1))  // x is pow(2, k), k=1,2, ...
 #define  FT_DIRECT              -1                           // Direct transform.
 #define  FT_INVERSE             1                            // Inverse transform.
