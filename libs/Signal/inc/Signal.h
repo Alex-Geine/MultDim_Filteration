@@ -69,6 +69,9 @@ class Signal
 
     // Get picture array
     uint8_t* GetPicture();
+
+    // Get picture array
+    bool GetPicture(uint8_t* pic);
 };
 
 // Class witch representation Gauss signal
@@ -181,8 +184,12 @@ class RealSignal : public Signal
     void Resize();
 };
 
-// Multidimensional FFT
-bool g_mfft(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag);
+// Multidimensional FFT Direct
+bool g_mfftDir(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag);
+
+// Multidimensional FFT Inverce
+bool g_mfftInv(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag);
+
 
 // FFT
 bool g_fft(std::complex<double>* inData, std::complex<double>* outData, uint64_t size, uint64_t flag);

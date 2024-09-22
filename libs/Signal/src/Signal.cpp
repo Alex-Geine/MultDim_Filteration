@@ -132,27 +132,46 @@ uint8_t* Signal::GetPicture()
         if (max < std::abs(m_dataArray[i / m_colomns][i % m_colomns]))
             max = std::abs(m_dataArray[i / m_colomns][i % m_colomns]);
 
-    //std::cout << "Max: " << max << std::endl;
-    //std::cout << (1. - std::abs(m_dataArray[0][0]) / max) << std::endl;
-    //std::cout << (1. - std::abs(m_dataArray[m_strings / 2][m_colomns / 2] / max)) << std::endl;
-    //std::cout << (uint32_t)(255 * (1. - std::abs(m_dataArray[0][0]) / max)) << std::endl;
-    //std::cout << (uint32_t)(255 * (1. - std::abs(m_dataArray[m_strings / 2][m_colomns / 2] / max))) << std::endl;
-
     uint64_t counter = 0;
     for (uint64_t i = 0; i < m_strings; ++i)
     {
         for (uint64_t j = 0; j < m_colomns; ++j)
         {
             res[counter] = uint8_t((1. - std::abs(m_dataArray[i][j]) / max) * 255.);
-    //        std::cout << (uint32_t)res[counter] << " ";
             counter++;
         }
-    //    std::cout << std::endl;
     }
-    //std::cout << std::endl;
 
     return res;
 };
+
+// Get picture array
+bool Signal::GetPicture(uint8_t* pic)
+{
+    if ((m_dataArray == nullptr) || (m_strings == 0) || (m_colomns == 0) || (pic == nullptr))
+        return false;
+
+    uint64_t size = m_strings * m_colomns;
+
+    double max = std::abs(m_dataArray[0][0]);
+
+    for (uint64_t i = 1; i < size; ++i)
+        if (max < std::abs(m_dataArray[i / m_colomns][i % m_colomns]))
+            max = std::abs(m_dataArray[i / m_colomns][i % m_colomns]);
+
+    uint64_t counter = 0;
+    for (uint64_t i = 0; i < m_strings; ++i)
+    {
+        for (uint64_t j = 0; j < m_colomns; ++j)
+        {
+            pic[counter] = uint8_t((1. - std::abs(m_dataArray[i][j]) / max) * 255.);
+            counter++;
+        }
+    }
+
+    return true;
+};
+
 
 // Get energy of signal
 double Signal::GetEnergy()
