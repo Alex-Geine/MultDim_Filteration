@@ -49,6 +49,7 @@ GaussSignal::GaussSignal ( uint64_t numberOfGauss,
 
         for (uint64_t i = 0; i < N; ++i)
         {
+            y = bot;
             for (uint64_t j = 0; j < N; ++j)
             {
                  for (uint64_t k = 0; k < numberOfGauss; ++k)
@@ -59,6 +60,7 @@ GaussSignal::GaussSignal ( uint64_t numberOfGauss,
 
             x += dx;
         }
+
     }
 };
 

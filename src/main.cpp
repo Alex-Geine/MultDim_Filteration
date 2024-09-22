@@ -183,14 +183,27 @@ void GaussPic()
 {
     uint32_t col         = N;
     uint32_t str         = N;
-    double   weight      = 1;
-    double   noizeLevel  = 1;   // In Db
+    double   noizeLevel  = -50;   // In Db
     double   filterLevel = -5;  // In Db
+
+    //uint32_t numberOfGauss = 3;
+    //std::vector<double> x0{0.1, 0, -0.1};
+    //std::vector<double> y0{0.1, 0, -0.1};
+    //std::vector<double> ampl{1, 0.5, 1};
+    //std::vector<double> sigmaX{0.1, 0.2, 0.3};
+    //std::vector<double> sigmaY{0.1, 0.2, 0.3};
+
+    uint32_t numberOfGauss = 1;
+    std::vector<double> x0{0};
+    std::vector<double> y0{0};
+    std::vector<double> ampl{1};
+    std::vector<double> sigmaX{1};
+    std::vector<double> sigmaY{1};
 
     uint8_t* pic  = new uint8_t[col * str * 3];
     uint8_t* data = new uint8_t[col * str];
 
-    Signal* testSig = new TestSignal(weight);
+    Signal* testSig = new GaussSignal(numberOfGauss, x0.data(), y0.data(), ampl.data(), sigmaX.data(), sigmaY.data());
     Signal specture(col, str);
     Signal* filteredSpectre = nullptr;
     Signal filteredPic(col, str);

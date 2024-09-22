@@ -132,7 +132,6 @@ bool g_mfftDir(std::complex<double>** inData, std::complex<double>** outData, ui
 
     bool res;
 
-
     // Strings
     for (uint64_t i = 0; i < strings; ++i)
     {
@@ -263,6 +262,12 @@ bool g_noizeSignal(Signal& sig, double Db)
     std::complex<double>** noiseData = noise.GetDataArray();
     std::complex<double>** sigData   = sig.GetDataArray();
 
+    std::complex<double>   deletedValue    = sigData[0][0];
+
+    // Delete first point
+    sigData[0][0].real(0);
+    sigData[0][0].imag(0);
+
     for (uint64_t i = 0; i < strings; ++i)
         for (uint64_t j = 0; j < colomns; ++j)
             noiseData[i][j].real(g_random());
@@ -271,9 +276,13 @@ bool g_noizeSignal(Signal& sig, double Db)
     double energyNoise = noise.GetEnergy();
     double koef        = energySig / energyNoise * (std::pow(10, Db / 10));
 
+    std::cout << "koef: " << koef << ", Db: " << Db << std::endl;
+
     for (uint64_t i = 0; i < strings; ++i)
          for (uint64_t j = 0; j < colomns; ++j)
              sigData[i][j].real(sigData[i][j].real() + koef * noiseData[i][j].real());
+
+   sigData[0][0] = deletedValue;
 
     return true;
 };
