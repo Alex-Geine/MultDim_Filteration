@@ -47,9 +47,16 @@ TestSignal::TestSignal(double weight) : Signal(N ,N)
         uint64_t               idyMax  = idxMax;
         uint64_t               idyMin  = idxMin;
 
+        std::cout << "idxMax: " << idxMax << ", idxMin: " << idxMin << ", idYMax: " << idyMax << ", idyMin: " << idyMin << std::endl;
+
         for (uint64_t i = idxMin; i < idxMax; ++i)
             for (uint64_t j = idyMin; j < idyMax; ++j)
-                data[i][j].real(1);
+                data[i][j].real(255);
+
+        //for (uint64_t i = 0; i < N * N; ++i)
+        //    std::cout << std::abs(data[i / N][i % N]) << std::endl;
+
+        std::cout << std::endl;
     }
 };
 

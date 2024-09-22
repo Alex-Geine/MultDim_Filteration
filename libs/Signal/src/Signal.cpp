@@ -118,7 +118,7 @@ std::complex<double>** Signal::GetDataArray()
 };
 
 // Get picture array
-uint8_t* Signal::GetPictureArray()
+uint8_t* Signal::GetPicture()
 {
     if ((m_dataArray == nullptr) || (m_strings == 0) || (m_colomns == 0))
         return nullptr;
@@ -127,14 +127,14 @@ uint8_t* Signal::GetPictureArray()
     uint64_t size = m_strings * m_colomns;
 
     double max = std::abs(m_dataArray[0][0]);
-    
+
     for (uint64_t i = 1; i < size; ++i)
         if (max < std::abs(m_dataArray[i / m_colomns][i % m_colomns]))
             max = std::abs(m_dataArray[i / m_colomns][i % m_colomns]);
 
     for (uint64_t i = 0; i < size; ++i)
         res[i] = uint8_t(std::abs(m_dataArray[i / m_colomns][i % m_colomns]) / max * 255);
-    
+
     return res;
 };
 

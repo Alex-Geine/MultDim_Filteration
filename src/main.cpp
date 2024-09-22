@@ -12,21 +12,23 @@ void printData(uint8_t* data, uint32_t col, uint32_t str)
 };
 
 int main(int argc,char **argv)
-{     
+{
     InitializeMagick(*argv);
     uint32_t col = N;
     uint32_t str = N;
     double weight = 10;
-    
-    TestSignal testSig(weight);
-    
-    uint8_t* data = testSig.GetPictureArray();
-    uint8_t* pic  = new uint8_t[col * str * 3];
-    
-    printData(data, col, str);
 
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("f"), col, str, pic);
+    Signal* testSig = new TestSignal(weight);
+
+    double En = testSig->GetEnergy();
+
+    uint8_t* data = testSig->GetPicture();
+    uint8_t* pic  = new uint8_t[col * str * 3];
+
+     printData(data, col, str);
+
+     //g_toGrayScaleOut(col, str, data, pic);
+     //g_safeImage(std::string("f"), col, str, pic);
 
      //std::string name("not-gnature.bmp");
      //uint32_t width  = 0;

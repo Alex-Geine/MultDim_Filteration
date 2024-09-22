@@ -68,7 +68,7 @@ class Signal
     std::complex<double>** GetDataArray();
 
     // Get picture array
-    uint8_t* GetPictureArray();
+    uint8_t* GetPicture();
 };
 
 // Class witch representation Gauss signal
