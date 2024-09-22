@@ -51,15 +51,15 @@ RealSignal::RealSignal(uint8_t* dataArray, uint64_t colomns, uint64_t strings) :
     {
         m_actualColomns = colomns;
         m_actualStrings = strings;
-     
+
         uint64_t size = colomns * strings;
-        
+
         colomns = Signal::GetNumberOfColomns();
         strings = Signal::GetNumberOfStrings();
 
         std::complex<double>** data = Signal::GetDataArray();
 
-        for (uint64_t i = 0; i < size; ++i)        
+        for (uint64_t i = 0; i < size; ++i)
             data[i / colomns][i % colomns].real(dataArray[i]);
     }
 };
@@ -76,13 +76,15 @@ uint64_t RealSignal::GetActualNumberOfStrings()
     return m_actualStrings;
 };
 
+//std::vector<uint64_t> numbers{2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
+
 // Cheking powers of two
 uint64_t RealSignal::PowersOfTwo(uint64_t num)
 {
     uint64_t n = 2;
 
-    while (num % n != num)
-        n * 2;
+    while (num > n)
+        n = n << 1;
 
     return n;
 };
