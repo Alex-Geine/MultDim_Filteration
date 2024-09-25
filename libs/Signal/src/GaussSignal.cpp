@@ -47,13 +47,18 @@ GaussSignal::GaussSignal ( uint64_t numberOfGauss,
         double                 x     = left;
         double                 y     = bot;
 
+        double sum = 0;
+
         for (uint64_t i = 0; i < N; ++i)
         {
             y = bot;
             for (uint64_t j = 0; j < N; ++j)
             {
                  for (uint64_t k = 0; k < numberOfGauss; ++k)
-                     data[i][j].real(Gauss(x, y, amplArray[k], x0Array[k], y0Array[k], sigmaXArray[k], sigmaYArray[k]));
+                     sum += Gauss(x, y, amplArray[k], x0Array[k], y0Array[k], sigmaXArray[k], sigmaYArray[k]);
+
+                 data[i][j].real(sum);
+                 sum = 0;
 
                  y += dy;
             }
