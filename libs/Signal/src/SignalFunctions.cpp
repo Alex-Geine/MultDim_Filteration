@@ -274,7 +274,7 @@ bool g_noizeSignal(Signal& sig, double Db)
 
     double energySig   = sig.GetEnergy();
     double energyNoise = noise.GetEnergy();
-    double koef        = energySig / energyNoise * (std::pow(10, Db / 10));
+    double koef        = 1. / std::pow(10, Db / 10);
 
     std::cout << "koef: " << koef << ", Db: " << Db << std::endl;
 
@@ -290,8 +290,8 @@ bool g_noizeSignal(Signal& sig, double Db)
 // Filtration function
 Signal* g_squareFiltration(Signal& sig, double Db)
 {
-    if (Db > 0)
-        Db = 0;
+    if (Db < 1)
+        Db = 1;
 
     Signal* filteredSignal = new Signal(sig);
 
@@ -326,10 +326,10 @@ Signal* g_squareFiltration(Signal& sig, double Db)
     uint64_t newIdx = 0;
     uint64_t newIdy = 0;
 
-    double curLevel = 10 * std::log10(energyFiltSig / energyRealSig);
+    double curLevel = 10 * std::log10(energyRealSig / energyFiltSig);
 
     // Processing filtration
-    while (Db < curLevel)
+    while (Db > curLevel)
     {
         if ((idx <= dIdx) && (idy <= dIdy))
         {
@@ -378,7 +378,7 @@ Signal* g_squareFiltration(Signal& sig, double Db)
         energyRealSig = sig.GetEnergy();
         energyFiltSig = filteredSignal->GetEnergy();
 
-        curLevel = 10 * std::log10(energyFiltSig / energyRealSig);
+        curLevel = 10 * std::log10(energyRealSig / energyFiltSig);
     }
 
     realSigData[0][0]     = deletedValue;

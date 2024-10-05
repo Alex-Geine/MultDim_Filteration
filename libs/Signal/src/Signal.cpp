@@ -146,7 +146,7 @@ uint8_t* Signal::GetPicture()
 };
 
 // Get picture array
-bool Signal::GetPicture(uint8_t* pic)
+bool Signal::GetPicture(uint8_t* pic, bool isInvert)
 {
     if ((m_dataArray == nullptr) || (m_strings == 0) || (m_colomns == 0) || (pic == nullptr))
         return false;
@@ -164,7 +164,10 @@ bool Signal::GetPicture(uint8_t* pic)
     {
         for (uint64_t j = 0; j < m_colomns; ++j)
         {
-            pic[counter] = uint8_t((1. - std::abs(m_dataArray[i][j]) / max) * 255.);
+            if (isInvert)
+                pic[counter] = uint8_t((1. - std::abs(m_dataArray[i][j]) / max) * 255.);
+            else
+                pic[counter] = uint8_t(std::abs(m_dataArray[i][j] / max) * 255.);
             counter++;
         }
     }

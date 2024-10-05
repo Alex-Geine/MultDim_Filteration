@@ -62,9 +62,9 @@ int main(int argc,char **argv)
            return 0;
        }
 
-       std::cout << "Noise level (Db): " << std::endl;
+       std::cout << "SNR (Db): " << std::endl;
        std::cin >> noiseLevel;
-       std::cout << "Filter level (Db): " << std::endl;
+       std::cout << "Filter SNR (Db): " << std::endl;
        std::cin >> filterLevel;
 
        if (funk == 1)
@@ -187,14 +187,14 @@ void TestPicNew(double noiseLevel, double _filterLevel)
     std::complex<double>** filPic  = nullptr;
 
     // Gen Signal
-    testSig->GetPicture(data);
+    testSig->GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
     // Adding noize
     g_noizeSignal(*testSig, noizeLevel);
-    testSig->GetPicture(data);
+    testSig->GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
@@ -208,13 +208,13 @@ void TestPicNew(double noiseLevel, double _filterLevel)
     filteredSpectre = g_squareFiltration(specture, filterLevel);
 
     // Out spectre
-    specture.GetPicture(data);
+    specture.GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
     // Out filtered spectre
-    filteredSpectre->GetPicture(data);
+    filteredSpectre->GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
@@ -225,7 +225,7 @@ void TestPicNew(double noiseLevel, double _filterLevel)
 
     g_mfftInv(filSpec, filPic, str, col, FT_INVERSE);
 
-    filteredPic.GetPicture(data);
+    filteredPic.GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Filtered.bmp"), col, str, pic);
@@ -270,14 +270,14 @@ void GaussPic(double noiseLevel, double _filterLevel)
     std::complex<double>** filPic  = nullptr;
 
     // Gen Signal
-    testSig->GetPicture(data);
+    testSig->GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
     // Adding noize
     g_noizeSignal(*testSig, noizeLevel);
-    testSig->GetPicture(data);
+    testSig->GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
@@ -291,14 +291,14 @@ void GaussPic(double noiseLevel, double _filterLevel)
     filteredSpectre = g_squareFiltration(specture, filterLevel);
 
     // Out spectre
-    specture.GetPicture(data);
+    specture.GetPicture(data, true);
     logScale(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
     // Out filtered spectre
-    filteredSpectre->GetPicture(data);
+    filteredSpectre->GetPicture(data, true);
     logScale(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
@@ -310,7 +310,7 @@ void GaussPic(double noiseLevel, double _filterLevel)
 
     g_mfftInv(filSpec, filPic, str, col, FT_INVERSE);
 
-    filteredPic.GetPicture(data);
+    filteredPic.GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Filtered.bmp"), col, str, pic);
@@ -357,17 +357,17 @@ void NaturePic(double noiseLevel, double _filterLevel)
 
     // Gen Signal
     std::cout << "Col: " << testSig->GetNumberOfColomns() <<
-	         ", str: " << testSig->GetNumberOfStrings() << std::endl;
+         ", str: " << testSig->GetNumberOfStrings() << std::endl;
     testSig->Resize();
     std::cout << "Col: " << testSig->GetNumberOfColomns() <<
-	         ", str: " << testSig->GetNumberOfStrings() << std::endl;
+         ", str: " << testSig->GetNumberOfStrings() << std::endl;
     col = testSig->GetNumberOfColomns();
-    
+
     str = testSig->GetNumberOfStrings();
     uint8_t* newData = new uint8_t[col * str];
     uint8_t* newPic  = new uint8_t[col * str * 3];
-    testSig->GetPicture(newData);
-    
+    testSig->GetPicture(newData, false);
+
     g_toGrayScaleOut(col, str, newData, newPic);
     g_safeImage(std::string("Signal.bmp"), col, str, newPic);
 

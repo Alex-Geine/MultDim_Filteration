@@ -71,7 +71,7 @@ class Signal
     uint8_t* GetPicture();
 
     // Get picture array
-    bool GetPicture(uint8_t* pic);
+    bool GetPicture(uint8_t* pic, bool isInverse);
 };
 
 // Class witch representation Gauss signal
