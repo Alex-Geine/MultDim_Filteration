@@ -56,6 +56,12 @@ int main(int argc,char **argv)
 
        std::cin >> funk;
 
+       if (funk == 4)
+       {
+           std::cout << "Exit..." << std::endl;
+           return 0;
+       }
+
        std::cout << "Noise level (Db): " << std::endl;
        std::cin >> noiseLevel;
        std::cout << "Filter level (Db): " << std::endl;
