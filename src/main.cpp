@@ -343,7 +343,8 @@ void NaturePic(double noiseLevel, double _filterLevel)
     std::cout << "GrayScaling complete!" << std::endl;
 
     std::cout << "Creating signal..." << std::endl;
-    Signal* testSig = new RealSignal(data, col, str);
+    std::cout << "Col: " << col << ", str: " << str << std::endl;
+    RealSignal* testSig = new RealSignal(data, col, str);
     std::cout << "Signal created!" << std::endl;
     //Signal specture(col, str);
     //Signal* filteredSpectre = nullptr;
@@ -355,10 +356,20 @@ void NaturePic(double noiseLevel, double _filterLevel)
     //std::complex<double>** filPic  = nullptr;
 
     // Gen Signal
-    testSig->GetPicture(data);
-
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("Signal.bmp"), col, str, pic);
+    std::cout << "Col: " << testSig->GetNumberOfColomns() <<
+	         ", str: " << testSig->GetNumberOfStrings() << std::endl;
+    testSig->Resize();
+    std::cout << "Col: " << testSig->GetNumberOfColomns() <<
+	         ", str: " << testSig->GetNumberOfStrings() << std::endl;
+    col = testSig->GetNumberOfColomns();
+    
+    str = testSig->GetNumberOfStrings();
+    uint8_t* newData = new uint8_t[col * str];
+    uint8_t* newPic  = new uint8_t[col * str * 3];
+    testSig->GetPicture(newData);
+    
+    g_toGrayScaleOut(col, str, newData, newPic);
+    g_safeImage(std::string("Signal.bmp"), col, str, newPic);
 
     // Adding noize
     //g_noizeSignal(*testSig, noizeLevel);

@@ -54,13 +54,20 @@ RealSignal::RealSignal(uint8_t* dataArray, uint64_t colomns, uint64_t strings) :
 
         uint64_t size = colomns * strings;
 
-        colomns = Signal::GetNumberOfColomns();
-        strings = Signal::GetNumberOfStrings();
+        //colomns = Signal::GetNumberOfColomns();
+        //strings = Signal::GetNumberOfStrings();
 
         std::complex<double>** data = Signal::GetDataArray();
 
+        // Notmalization
+        uint8_t max = 0;
+
+        for (uint32_t i = 0; i < size; ++i)
+            if (max < dataArray[i])
+                max = dataArray[i];
+
         for (uint64_t i = 0; i < size; ++i)
-            data[i / colomns][i % colomns].real(dataArray[i]);
+            data[i / colomns][i % colomns].real((double)dataArray[i] / (double)max);
     }
 };
 
@@ -92,6 +99,12 @@ uint64_t RealSignal::PowersOfTwo(uint64_t num)
 // Resize
 void RealSignal::Resize()
 {
+    uint32_t tempCol = Signal::GetNumberOfColomns();
+    uint32_t tempStr = Signal::GetNumberOfStrings();
+
     Signal::SetNumberOfColomns(m_actualColomns);
     Signal::SetNumberOfStrings(m_actualStrings);
+
+    m_actualColomns = tempCol;
+    m_actualStrings = tempStr;
 };

@@ -182,9 +182,6 @@ class RealSignal : public Signal
 
     // Resize
     void Resize();
-
-    // Swap picture sizes
-    void SwapSizes();
 };
 
 // Multidimensional FFT Direct
