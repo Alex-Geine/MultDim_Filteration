@@ -50,7 +50,7 @@ TestSignal::TestSignal(double weight) : Signal(N ,N)
 
         for (uint64_t i = idxMin; i < idxMax; ++i)
             for (uint64_t j = idyMin; j < idyMax; ++j)
-                data[i][j] = std::complex<double>{255, 0};
+                data[i][j] = std::complex<double>{1., 0.};
 
         //for (uint64_t i = 0; i < N * N; ++i)
         //     std::cout << std::abs(data[i / N][i % N]) << " " << std::endl;

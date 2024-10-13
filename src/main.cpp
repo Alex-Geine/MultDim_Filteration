@@ -89,87 +89,11 @@ int main(int argc,char **argv)
     return 0;
 };
 
-
-void TestPicOld(double noiseLevel, double _filterLevel)
-{
-    uint32_t col         = N;
-    uint32_t str         = N;
-    double   weight      = 1;
-    double   noizeLevel  = noiseLevel;   // In Db
-    double   filterLevel = _filterLevel;  // In Db
-    uint8_t* pic         = new uint8_t[col * str * 3];
-
-    Signal* testSig = new TestSignal(weight);
-    Signal specture(col, str);
-    Signal* filteredSpectre = nullptr;
-    Signal filteredPic(col, str);
-
-    uint8_t* data      = nullptr;
-    uint8_t* noizeData = nullptr;
-    uint8_t* s         = nullptr;
-    uint8_t* specArray = nullptr;
-    uint8_t* fPic      = nullptr;
-
-    std::complex<double>** sig     = nullptr;
-    std::complex<double>** spec    = nullptr;
-    std::complex<double>** filSpec = nullptr;
-    std::complex<double>** filPic  = nullptr;
-
-    // Gen Signal
-    data = testSig->GetPicture();
-
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("Signal.bmp"), col, str, pic);
-
-    // Adding noize
-    g_noizeSignal(*testSig, noizeLevel);
-    noizeData = testSig->GetPicture();
-
-    g_toGrayScaleOut(col, str, noizeData, pic);
-    g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
-
-    // Get fft
-    sig  = testSig->GetDataArray();
-    spec = specture.GetDataArray();
-
-    g_mfftDir(sig, spec, str, col, FT_DIRECT);
-
-    filteredSpectre = g_squareFiltration(specture, filterLevel);
-
-    s         = specture.GetPicture();
-    specArray = filteredSpectre->GetPicture();
-
-    g_toGrayScaleOut(col, str, s, pic);
-    g_safeImage(std::string("Specture.bmp"), col, str, pic);
-
-    g_toGrayScaleOut(col, str, specArray, pic);
-    g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
-
-
-    // Get filt pic
-    filSpec = filteredSpectre->GetDataArray();
-    filPic = filteredPic.GetDataArray();
-
-    g_mfftInv(filSpec, filPic, str, col, FT_INVERSE);
-
-    fPic = filteredPic.GetPicture();
-
-    g_toGrayScaleOut(col, str, fPic, pic);
-    g_safeImage(std::string("Filtered.bmp"), col, str, pic);
-
-    delete[] pic;
-    delete[] data;
-    delete[] noizeData;
-    delete[] s;
-    delete[] specArray;
-    delete[] fPic;
-};
-
 void TestPicNew(double noiseLevel, double _filterLevel)
 {
     uint32_t col         = N;
     uint32_t str         = N;
-    double   weight      = 1;
+    double   weight      = 50;
     double   noizeLevel  = noiseLevel;   // In Db
     double   filterLevel = _filterLevel;  // In Db
 
@@ -187,17 +111,17 @@ void TestPicNew(double noiseLevel, double _filterLevel)
     std::complex<double>** filPic  = nullptr;
 
     // Gen Signal
-    testSig->GetPicture(data, true);
+    //testSig->GetPicture(data, true);
 
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("Signal.bmp"), col, str, pic);
+    //g_toGrayScaleOut(col, str, data, pic);
+    //g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
     // Adding noize
-    g_noizeSignal(*testSig, noizeLevel);
-    testSig->GetPicture(data, true);
+    //g_noizeSignal(*testSig, noizeLevel);
+    //testSig->GetPicture(data, true);
 
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
+    //g_toGrayScaleOut(col, str, data, pic);
+    //g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
 
     // Get fft
     sig  = testSig->GetDataArray();
@@ -205,35 +129,38 @@ void TestPicNew(double noiseLevel, double _filterLevel)
 
     g_mfftDir(sig, spec, str, col, FT_DIRECT);
 
-    filteredSpectre = g_squareFiltration(specture, filterLevel);
+    //filteredSpectre = g_squareFiltration(specture, filterLevel);
 
     // Out spectre
-    specture.GetPicture(data, true);
+    //specture.GetPicture(data, true);
 
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("Specture.bmp"), col, str, pic);
+    //g_toGrayScaleOut(col, str, data, pic);
+    //g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
     // Out filtered spectre
-    filteredSpectre->GetPicture(data, true);
+    //filteredSpectre->GetPicture(data, true);
 
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
+    //g_toGrayScaleOut(col, str, data, pic);
+    //g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
 
     // Get filt pic
-    filSpec = filteredSpectre->GetDataArray();
+    filSpec = specture.GetDataArray();
+    //filSpec = filteredSpectre->GetDataArray();
     filPic = filteredPic.GetDataArray();
 
-    g_mfftInv(filSpec, filPic, str, col, FT_INVERSE);
+    g_mfftDir(filSpec, filPic, str, col, FT_INVERSE);
 
     filteredPic.GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Filtered.bmp"), col, str, pic);
 
+    std::cout << "SNR (square error): " << testSig->GetSquareError(filteredPic) << " (Db)" << std::endl;
+    std::cout << "SNR (pixel error): " << testSig->GetPixelError(filteredPic) << " (Db)" << std::endl;
+
     delete[] pic;
     delete[] data;
 };
-
 
 void GaussPic(double noiseLevel, double _filterLevel)
 {
@@ -324,6 +251,8 @@ void NaturePic(double noiseLevel, double _filterLevel)
 {
     uint32_t col         = 0;
     uint32_t str         = 0;
+    uint32_t acCol       = 0;
+    uint32_t acStr       = 0;
     double   noizeLevel  = noiseLevel;   // In Db
     double   filterLevel = _filterLevel;  // In Db
 
@@ -335,8 +264,10 @@ void NaturePic(double noiseLevel, double _filterLevel)
 
     std::cout << "load complete!" << std::endl;
 
-    uint8_t* data = new uint8_t[col * str];
-    uint8_t* pic  = new uint8_t[col * str * 3];
+    uint8_t* data     = new uint8_t[col * str];
+    uint8_t* pic      = new uint8_t[col * str * 3];
+    uint8_t* dataSpec = nullptr;
+    uint8_t* picSpec  = nullptr;
 
     std::cout << "GrayScaling..." << std::endl;
     g_toGrayScaleIn(col, str, inPic, data);
@@ -345,80 +276,87 @@ void NaturePic(double noiseLevel, double _filterLevel)
     std::cout << "Creating signal..." << std::endl;
     std::cout << "Col: " << col << ", str: " << str << std::endl;
     RealSignal* testSig = new RealSignal(data, col, str);
-    std::cout << "Signal created!" << std::endl;
-    //Signal specture(col, str);
-    //Signal* filteredSpectre = nullptr;
-    //Signal filteredPic(col, str);
 
-    //std::complex<double>** sig     = nullptr;
-    //std::complex<double>** spec    = nullptr;
-    //std::complex<double>** filSpec = nullptr;
-    //std::complex<double>** filPic  = nullptr;
+    acCol = testSig->GetNumberOfColomns();
+    acStr = testSig->GetNumberOfStrings();
+
+    dataSpec = new uint8_t[acCol * acStr];
+    picSpec  = new uint8_t[acCol * acStr * 3];
+    std::cout << "Signal created!" << std::endl;
+    Signal specture(acCol, acStr);
+    Signal* filteredSpectre = nullptr;
+    Signal filteredPic(acCol, acStr);
+
+    std::complex<double>** sig     = nullptr;
+    std::complex<double>** spec    = nullptr;
+    std::complex<double>** filSpec = nullptr;
+    std::complex<double>** filPic  = nullptr;
 
     // Gen Signal
-    std::cout << "Col: " << testSig->GetNumberOfColomns() <<
-         ", str: " << testSig->GetNumberOfStrings() << std::endl;
     testSig->Resize();
-    std::cout << "Col: " << testSig->GetNumberOfColomns() <<
-         ", str: " << testSig->GetNumberOfStrings() << std::endl;
-    col = testSig->GetNumberOfColomns();
+    testSig->GetPicture(data, false);
 
-    str = testSig->GetNumberOfStrings();
-    uint8_t* newData = new uint8_t[col * str];
-    uint8_t* newPic  = new uint8_t[col * str * 3];
-    testSig->GetPicture(newData, false);
-
-    g_toGrayScaleOut(col, str, newData, newPic);
-    g_safeImage(std::string("Signal.bmp"), col, str, newPic);
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
     // Adding noize
-    //g_noizeSignal(*testSig, noizeLevel);
-    //testSig->GetPicture(data);
+    testSig->Resize();
+    g_noizeSignal(*testSig, noizeLevel);
+    testSig->Resize();
+    testSig->GetPicture(data, false);
 
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
 
     // Get fft
-    //sig  = testSig->GetDataArray();
-    //spec = specture.GetDataArray();
+    testSig->Resize();
+    sig  = testSig->GetDataArray();
+    spec = specture.GetDataArray();
 
-    //g_mfftDir(sig, spec, str, col, FT_DIRECT);
+    std::cout << "SigCol: " << testSig->GetNumberOfColomns()
+              << "SigStr: " << testSig->GetNumberOfStrings()
+              << std::endl;
+    std::cout << "SpecCol: " << specture.GetNumberOfColomns()
+              << "SpecStr: " << specture.GetNumberOfStrings()
+              << std::endl;
 
-    //filteredSpectre = g_squareFiltration(specture, filterLevel);
+    if (g_mfftDir(sig, spec, acStr, acCol, FT_DIRECT))
+        std::cout << "FFT is ok!" << std::endl;
 
-    // Out spectre
-    //Signal drawSpec(specture);
-    //Signal drawFilSpec(*filteredSpectre);
+    // Draw spec
+    specture.GetPicture(dataSpec, false);
+    logScale(dataSpec, acCol, acStr);
 
-    //spec = drawSpec.GetDataArray();
-    //sig  = drawFilSpec.GetDataArray();
+    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
+    g_safeImage(std::string("Specture.bmp"), acCol, acStr, picSpec);
 
-    //logScale(spec, col, str);
-    //logScale(sig, col, str);
+    std::cout << "Filter specture..." << std::endl;
+    filteredSpectre = g_squareFiltration(specture, filterLevel);
+    if (filteredSpectre == nullptr)
+        std::cout << "Filtration failed!" << std::endl;
+    std::cout << "FilSpecCol: " << filteredSpectre->GetNumberOfColomns()
+              << "FilSpecStr: " << filteredSpectre->GetNumberOfStrings()
+              << std::endl;
+    // Draw fil spec
+    filteredSpectre->GetPicture(dataSpec, false);
+    logScale(dataSpec, acCol, acStr);
 
-    //drawSpec.GetPicture(data);
-
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("Specture.bmp"), col, str, pic);
-
-    // Out filtered spectre
-    //drawFilSpec.GetPicture(data);
-
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
+    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
+    g_safeImage(std::string("FilSpecture.bmp"), acCol, acStr, picSpec);
 
     // Get filt pic
-    //filSpec = filteredSpectre->GetDataArray();
-    //filPic = filteredPic.GetDataArray();
+    filSpec = filteredSpectre->GetDataArray();
+    filPic = filteredPic.GetDataArray();
 
-    //g_mfftInv(filSpec, filPic, str, col, FT_INVERSE);
+    if (g_mfftDir(filSpec, filPic, acStr, acCol, FT_INVERSE))
+        std::cout << "Inv FFT is ok!" << std::endl;
 
-    //filteredPic.GetPicture(data);
+    filteredPic.GetPicture(dataSpec, false);
 
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("Filtered.bmp"), col, str, pic);
+    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
+    g_safeImage(std::string("Filtered.bmp"), acCol, acStr, picSpec);
 
-    delete[] inPic;
-    delete[] pic;
-    delete[] data;
+    //delete[] inPic;
+    //delete[] pic;
+    //delete[] data;
 };

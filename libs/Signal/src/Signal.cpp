@@ -205,3 +205,36 @@ void Signal::DeleteDataArray()
 
     return;
 };
+
+// Get square error
+double Signal::GetSquareError(Signal& sig)
+{
+    double sum = 0;
+    std::complex<double>** sigData = sig.GetDataArray();
+
+    for (uint64_t i = 0; i < m_strings; ++i)
+        for (uint64_t j = 0; j < m_colomns; ++j)
+            sum += (std::abs(m_dataArray[i][j]) - std::abs(sigData[i][j])) * (std::abs(m_dataArray[i][j]) - std::abs(sigData[i][j]));
+
+    return 10 * std::log(GetEnergy() / sum);
+};
+
+// Get pixel error
+double Signal::GetPixelError(Signal& sig)
+{
+    uint64_t size = m_colomns * m_strings;
+    double   sum  = 0;
+
+    uint8_t* signalFirst  = new uint8_t[size];
+    uint8_t* signalSecond = new uint8_t[size];
+
+    GetPicture(signalFirst, false);
+    sig.GetPicture(signalSecond, false);
+
+    for (uint64_t i = 0; i < size; ++i)
+        sum += (signalFirst[i] - signalSecond[i]) * (signalFirst[i] - signalSecond[i]);
+
+    sum /= size;
+
+    return 10 * std::log10(255 * 255 / sum);
+};

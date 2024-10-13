@@ -7,7 +7,7 @@
 #include <time.h>
 #include <cstdint>
 
-#define  N                      1024                         // Base dimension of signal
+#define  N                      16                         // Base dimension of signal
 #define  NUMBER_IS_2_POW_K(x)   ((!((x)&((x)-1)))&&((x)>1))  // x is pow(2, k), k=1,2, ...
 #define  FT_DIRECT              -1                           // Direct transform.
 #define  FT_INVERSE             1                            // Inverse transform.
@@ -72,6 +72,12 @@ class Signal
 
     // Get picture array
     bool GetPicture(uint8_t* pic, bool isInverse);
+
+    // Get square error
+    double GetSquareError(Signal& sig);
+
+    // Get pixel error
+    double GetPixelError(Signal& sig);
 };
 
 // Class witch representation Gauss signal
@@ -185,7 +191,7 @@ class RealSignal : public Signal
 };
 
 // Multidimensional FFT Direct
-bool g_mfftDir(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag);
+bool g_mfftDir(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, uint64_t flag);
 
 // Multidimensional FFT Inverce
 bool g_mfftInv(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag);
