@@ -245,6 +245,9 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Filtered.bmp"), col, str, pic);
 
+    std::cout << "SNR (square error): " << testSig->GetSquareError(filteredPic) << " in Db.)" << std::endl;
+    std::cout << "SNR (pixel error): " << testSig->GetPixelError(filteredPic) << " in Db.)" << std::endl;
+
     delete[] pic;
     delete[] data;
 };
@@ -356,6 +359,9 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw,
 
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("Filtered.bmp"), acCol, acStr, picSpec);
+
+    std::cout << "SNR (square error): " << testSig->GetSquareError(filteredPic) << " in Db." << std::endl;
+    std::cout << "SNR (pixel error): " << testSig->GetPixelError(filteredPic) << " in Db." << std::endl;
 
     delete[] inPic;
     delete[] pic;
