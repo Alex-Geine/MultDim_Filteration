@@ -30,13 +30,11 @@ void logScale(uint8_t* data, uint64_t col, uint64_t str)
        data[i] = 255 * std::log2(1 + data[i] * data[i]) / std::log2(1 + max * max);
 }
 
-void TestPicOld(double noizeLevel, double filterLevel);
+void TestPicNew(double noizeLevel, double filterLevel, std::string logScaleAnsw);
 
-void TestPicNew(double noizeLevel, double filterLevel);
+void GaussPic(double noizeLevel, double filterLevel, std::string logScaleAnsw);
 
-void GaussPic(double noizeLevel, double filterLevel);
-
-void NaturePic(double noizeLevel, double filterLevel);
+void NaturePic(double noizeLevel, double filterLevel, std::string logScaleAnsw, std::string interAnsw);
 
 int main(int argc,char **argv)
 {
@@ -47,6 +45,9 @@ int main(int argc,char **argv)
         uint64_t funk        = 0;
         double   noiseLevel  = 0;
         double   filterLevel = 0;
+
+        std::string logScaleAnsw;
+        std::string interAnsw;
 
         std::cout << "Please type the number of func: " << std::endl
                   << "1. TestSignal" << std::endl
@@ -66,18 +67,22 @@ int main(int argc,char **argv)
        std::cin >> noiseLevel;
        std::cout << "Filter SNR (Db): " << std::endl;
        std::cin >> filterLevel;
+       std::cout << "Log scale (y/n)?" << std::endl;
+       std::cin >> logScaleAnsw;
 
        if (funk == 1)
        {
-           TestPicNew(noiseLevel, filterLevel);
+           TestPicNew(noiseLevel, filterLevel, logScaleAnsw);
        }
        else if (funk == 2)
        {
-           GaussPic(noiseLevel, filterLevel);
+           GaussPic(noiseLevel, filterLevel, logScaleAnsw);
        }
        else if (funk == 3)
        {
-           NaturePic(noiseLevel, filterLevel);
+           std::cout << "Interpolation (y/n)?" << std::endl;
+           std::cin >> interAnsw;
+           NaturePic(noiseLevel, filterLevel, logScaleAnsw, interAnsw);
        }
        else
        {
@@ -89,11 +94,11 @@ int main(int argc,char **argv)
     return 0;
 };
 
-void TestPicNew(double noiseLevel, double _filterLevel)
+void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
 {
     uint32_t col         = N;
     uint32_t str         = N;
-    double   weight      = 50;
+    double   weight      = 1;
     double   noizeLevel  = noiseLevel;   // In Db
     double   filterLevel = _filterLevel;  // In Db
 
@@ -111,17 +116,17 @@ void TestPicNew(double noiseLevel, double _filterLevel)
     std::complex<double>** filPic  = nullptr;
 
     // Gen Signal
-    //testSig->GetPicture(data, true);
+    testSig->GetPicture(data, true);
 
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("Signal.bmp"), col, str, pic);
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
     // Adding noize
-    //g_noizeSignal(*testSig, noizeLevel);
-    //testSig->GetPicture(data, true);
+    g_noizeSignal(*testSig, noizeLevel);
+    testSig->GetPicture(data, true);
 
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
 
     // Get fft
     sig  = testSig->GetDataArray();
@@ -129,23 +134,26 @@ void TestPicNew(double noiseLevel, double _filterLevel)
 
     g_mfftDir(sig, spec, str, col, FT_DIRECT);
 
-    //filteredSpectre = g_squareFiltration(specture, filterLevel);
+    filteredSpectre = g_squareFiltration(specture, filterLevel);
 
     // Out spectre
-    //specture.GetPicture(data, true);
+    specture.GetPicture(data, true);
+    if (logScaleAnsw == "y")
+        logScale(data, col, str);
 
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("Specture.bmp"), col, str, pic);
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
     // Out filtered spectre
-    //filteredSpectre->GetPicture(data, true);
+    filteredSpectre->GetPicture(data, true);
+    if (logScaleAnsw == "y")
+        logScale(data, col, str);
 
-    //g_toGrayScaleOut(col, str, data, pic);
-    //g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
 
     // Get filt pic
-    filSpec = specture.GetDataArray();
-    //filSpec = filteredSpectre->GetDataArray();
+    filSpec = filteredSpectre->GetDataArray();
     filPic = filteredPic.GetDataArray();
 
     g_mfftDir(filSpec, filPic, str, col, FT_INVERSE);
@@ -162,7 +170,7 @@ void TestPicNew(double noiseLevel, double _filterLevel)
     delete[] data;
 };
 
-void GaussPic(double noiseLevel, double _filterLevel)
+void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
 {
     uint32_t col         = N;
     uint32_t str         = N;
@@ -175,13 +183,6 @@ void GaussPic(double noiseLevel, double _filterLevel)
     std::vector<double> ampl{1, 1, 1};
     std::vector<double> sigmaX{0.01, 0.02, 0.03};
     std::vector<double> sigmaY{0.01, 0.02, 0.03};
-
-    //uint32_t numberOfGauss = 1;
-    //std::vector<double> x0{0};
-    //std::vector<double> y0{0};
-    //std::vector<double> ampl{1};
-    //std::vector<double> sigmaX{0.05};
-    //std::vector<double> sigmaY{0.05};
 
     uint8_t* pic  = new uint8_t[col * str * 3];
     uint8_t* data = new uint8_t[col * str];
@@ -219,14 +220,16 @@ void GaussPic(double noiseLevel, double _filterLevel)
 
     // Out spectre
     specture.GetPicture(data, true);
-    logScale(data, col, str);
+    if (logScaleAnsw == "y")
+        logScale(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
     // Out filtered spectre
     filteredSpectre->GetPicture(data, true);
-    logScale(data, col, str);
+    if (logScaleAnsw == "y")
+        logScale(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
@@ -235,7 +238,7 @@ void GaussPic(double noiseLevel, double _filterLevel)
     filSpec = filteredSpectre->GetDataArray();
     filPic = filteredPic.GetDataArray();
 
-    g_mfftInv(filSpec, filPic, str, col, FT_INVERSE);
+    g_mfftDir(filSpec, filPic, str, col, FT_INVERSE);
 
     filteredPic.GetPicture(data, true);
 
@@ -247,7 +250,7 @@ void GaussPic(double noiseLevel, double _filterLevel)
 };
 
 
-void NaturePic(double noiseLevel, double _filterLevel)
+void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw, std::string interAnsw)
 {
     uint32_t col         = 0;
     uint32_t str         = 0;
@@ -325,21 +328,19 @@ void NaturePic(double noiseLevel, double _filterLevel)
 
     // Draw spec
     specture.GetPicture(dataSpec, false);
-    logScale(dataSpec, acCol, acStr);
+    if (logScaleAnsw == "y")
+        logScale(dataSpec, acCol, acStr);
 
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("Specture.bmp"), acCol, acStr, picSpec);
 
     std::cout << "Filter specture..." << std::endl;
     filteredSpectre = g_squareFiltration(specture, filterLevel);
-    if (filteredSpectre == nullptr)
-        std::cout << "Filtration failed!" << std::endl;
-    std::cout << "FilSpecCol: " << filteredSpectre->GetNumberOfColomns()
-              << "FilSpecStr: " << filteredSpectre->GetNumberOfStrings()
-              << std::endl;
+
     // Draw fil spec
     filteredSpectre->GetPicture(dataSpec, false);
-    logScale(dataSpec, acCol, acStr);
+    if (logScaleAnsw == "y")
+        logScale(dataSpec, acCol, acStr);
 
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("FilSpecture.bmp"), acCol, acStr, picSpec);
@@ -356,7 +357,7 @@ void NaturePic(double noiseLevel, double _filterLevel)
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("Filtered.bmp"), acCol, acStr, picSpec);
 
-    //delete[] inPic;
-    //delete[] pic;
-    //delete[] data;
+    delete[] inPic;
+    delete[] pic;
+    delete[] data;
 };

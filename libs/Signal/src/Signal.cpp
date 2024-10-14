@@ -216,6 +216,9 @@ double Signal::GetSquareError(Signal& sig)
         for (uint64_t j = 0; j < m_colomns; ++j)
             sum += (std::abs(m_dataArray[i][j]) - std::abs(sigData[i][j])) * (std::abs(m_dataArray[i][j]) - std::abs(sigData[i][j]));
 
+    if (sum == 0)
+       return 9999;
+
     return 10 * std::log(GetEnergy() / sum);
 };
 
@@ -235,6 +238,9 @@ double Signal::GetPixelError(Signal& sig)
         sum += (signalFirst[i] - signalSecond[i]) * (signalFirst[i] - signalSecond[i]);
 
     sum /= size;
+
+    if (sum == 0)
+        return 9999;
 
     return 10 * std::log10(255 * 255 / sum);
 };

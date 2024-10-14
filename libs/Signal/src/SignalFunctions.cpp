@@ -1,43 +1,7 @@
 #include "Signal.h"
 #include <vector>
+
 // Signal functions
-
-using cd = std::complex<double>;
-const double PI = acos(-1);
-
-void fft(std::vector<cd> & a, bool invert)
-{
-    int n = a.size();
-
-    std::vector<cd> a0(n / 2), a1(n / 2);
-
-    for (int i = 0; 2 * i < n; i++)
-    {
-        a0[i] = a[2*i];
-        a1[i] = a[2*i+1];
-    }
-
-    fft(a0, invert);
-    fft(a1, invert);
-
-    double ang = 2 * PI / n * (invert ? -1 : 1);
-
-    cd w(1), wn(cos(ang), sin(ang));
-
-    for (int i = 0; 2 * i < n; i++)
-    {
-        a[i] = a0[i] + w * a1[i];
-        a[i + n/2] = a0[i] - w * a1[i];
-
-        if (invert)
-        {
-            a[i] /= 2;
-            a[i + n/2] /= 2;
-        }
-
-        w *= wn;
-    }
-};
 
 // FFT
 bool g_fft(std::complex<double>* inData, std::complex<double>* outData, uint64_t size, uint64_t flag)
@@ -150,48 +114,6 @@ bool g_fft(std::complex<double>* inData, std::complex<double>* outData, uint64_t
     return true;
 };
 
-//int FFT2D(COMPLEX **c,int nx,int ny,int dir)
-//{
-//   int i,j;
-//   int m,twopm;
-//   double *real,*imag;
-
-   /* Transform the rows */
-//   real = (double *)malloc(nx * sizeof(double));
-//   imag = (double *)malloc(nx * sizeof(double));
-//   for (j=0;j<ny;j++) {
-//       for (i=0;i<nx;i++) {
-//           real[i] = c[i][j].real;
-//           imag[i] = c[i][j].imag;
-//   }
-//   FFT(dir,m,real,imag);
-//    for (i=0;i<nx;i++) {
-//         c[i][j].real = real[i];
-//       c[i][j].imag = imag[i];
-//      }
-//   }
-//   free(real);
-//   free(imag);
-
- /* Transform the columns */
-//   real = (double *)malloc(ny * sizeof(double));
-//   imag = (double *)malloc(ny * sizeof(double));
-//  for (i=0;i<nx;i++) {
-//      for (j=0;j<ny;j++) {
-//         real[j] = c[i][j].real;
-//         imag[j] = c[i][j].imag;
-//     }
-//     FFT(dir,m,real,imag);
-//    for (j=0;j<ny;j++) {
-//       c[i][j].real = real[j];
-//     c[i][j].imag = imag[j];
-//     }
-//   }
-//   free(real);
-//   free(imag);
-//   return(TRUE);
-//}
-
 // Multidimensional FFT
 bool g_mfftDir(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, uint64_t flag)
 {
@@ -251,93 +173,6 @@ bool g_mfftDir(std::complex<double>** inData, std::complex<double>** outData, ui
 
     delete[] data;
 
-    std::cout << "In signal: " << std::endl;
-    for (i = 0; i < strings; ++i)
-    {
-        for (j = 0; j < colomns; ++j)
-            std::cout << std::abs(inData[i][j]) << " ";
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    std::cout << "Out signal: " << std::endl;
-    for (i = 0; i < strings; ++i)
-    {
-        for (j = 0; j < colomns; ++j)
-            std::cout << std::abs(outData[i][j]) << " ";
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    return true;
-};
-
-// Multidimensional FFT Inverce
-bool g_mfftInv(std::complex<double>** inData, std::complex<double>** outData, uint64_t strings, uint64_t colomns, bool flag)
-{
-    if (inData  == nullptr)   return false;
-    if (outData == nullptr)   return false;
-    if (strings == 0)         return false;
-    if (colomns == 0)         return false;
-
-    std::complex<double>* strDataIn  = new std::complex<double>[strings];
-    std::complex<double>* strDataOut = new std::complex<double>[strings];
-    std::complex<double>* colDataOut = new std::complex<double>[colomns];
-
-    bool res;
-
-    // Colomns
-    for (uint64_t i = 0; i < colomns; ++i)
-    {
-        for (uint64_t j = 0; j < strings; ++j)
-        {
-            strDataIn[j].real(inData[j][i].real());
-            strDataIn[j].imag(inData[j][i].imag());
-        }
-
-        res = g_fft(strDataIn, strDataOut, strings, flag);
-
-        if ( !res )
-        {
-            delete[] strDataIn;
-            delete[] strDataOut;
-            delete[] colDataOut;
-
-            return false;
-        }
-
-        for (uint64_t j = 0; j < strings; ++j)
-        {
-            outData[j][i].real(strDataOut[j].real());
-            outData[j][i].imag(strDataOut[j].imag());
-        }
-    }
-
-    // Strings
-    for (uint64_t i = 0; i < strings; ++i)
-    {
-        res = g_fft(outData[i], colDataOut, colomns, flag);
-
-        for (uint64_t j = 0; j < colomns; ++j)
-        {
-             outData[i][j] = colDataOut[j];
-        }
-
-        if ( !res )
-        {
-            delete[] strDataIn;
-            delete[] strDataOut;
-            delete[] colDataOut;
-
-            return false;
-        }
-    }
-
-
-    delete[] strDataIn;
-    delete[] strDataOut;
-    delete[] colDataOut;
-
     return true;
 };
 
@@ -395,15 +230,10 @@ Signal* g_squareFiltration(Signal& sig, double Db)
 {
     if (Db < 0)
         Db = 0;
-				std::cout << "Start filtering.." << std::endl;
+
+    std::cout << "Start filtering.." << std::endl;
     Signal* filteredSignal = new Signal(sig);
-    return filteredSignal;
-				if (filteredSignal->GetNumberOfColomns() != sig.GetNumberOfColomns() ||
-						  filteredSignal->GetNumberOfStrings() != sig.GetNumberOfStrings())
-				{
-					   std::cout << "Signals not equal!" << std::endl;
-								return nullptr;
-				}
+
     std::complex<double>** realSigData     = sig.GetDataArray();
     std::complex<double>** filteredSigData = filteredSignal->GetDataArray();
     std::complex<double>   deletedValue    = realSigData[0][0];
@@ -423,14 +253,12 @@ Signal* g_squareFiltration(Signal& sig, double Db)
     uint64_t idy     = centIdy;
     uint64_t dIdx    = (double)colomns / 2. * persent;
     uint64_t dIdy    = (double)strings / 2. * persent;
-    //for (uint32_t i = 0; i < strings; ++i)
-		  	//for(uint32_t j = 0; j < colomns; ++j){std::cout << " " << std::abs(realSigData[i][j]) << 
-		    //   " " << std::abs(filteredSigData[i][j]);}
-						if (dIdx == 0)
+
+    if (dIdx == 0)
         dIdx = 1;
     if (dIdy == 0)
         dIdy = 1;
-    std::cout << "Init compeleted! " << std::endl;
+    
     double energyRealSig = sig.GetEnergy();
     double energyFiltSig = filteredSignal->GetEnergy();
 
@@ -438,13 +266,13 @@ Signal* g_squareFiltration(Signal& sig, double Db)
     uint64_t newIdy = 0;
 
     double curLevel = 10 * std::log10(energyRealSig / energyFiltSig);
-    std::cout << "Starting.." <<std::endl;
+
     // Processing filtration
-				while (Db > curLevel)
-				{
-					std::cout << "Iteration..." << std::endl;
-				std::cout << "Cur level: " << curLevel << std::endl;
-				std::cout << "SNR: " << Db << std::endl;
+    while (Db > curLevel)
+    {
+        std::cout << "Iteration..." << std::endl;
+        std::cout << "Cur level: " << curLevel << std::endl;
+        std::cout << "SNR: " << Db << std::endl;
         if ((idx <= dIdx) && (idy <= dIdy))
         {
             realSigData[0][0]     = deletedValue;
@@ -456,19 +284,13 @@ Signal* g_squareFiltration(Signal& sig, double Db)
         newIdx = idx - dIdx;
         newIdy = idy - dIdy;
 
-								std::cout << "Colomns: " << std::endl;
-								std::cout << "Str: " << strings << ", col: " << colomns <<std::endl;
-								std::cout << "newIdy: " << newIdx << ", idy: " << idx << std::endl;
-								std::cout << "centIdy: " << centIdx << std::endl;
         // Colomns
         for (uint64_t i = 0; i < strings; ++i)
         {
             for (uint64_t j = newIdx; j <= idx; ++j)
             {
-													//std::cout << "j: " << j << " ";
-													   //std::cout << centIdy + (centIdy - j) << std::endl;
                 // Left
-													   filteredSigData[i][j].real(0);
+                filteredSigData[i][j].real(0);
                 filteredSigData[i][j].imag(0);
 
                 //Right
@@ -482,7 +304,7 @@ Signal* g_squareFiltration(Signal& sig, double Db)
         {
             for (uint64_t j = newIdy; j <= idy; ++j)
             {
-													// Bot
+                // Bot
                 filteredSigData[j][i].real(0);
                 filteredSigData[j][i].imag(0);
 
