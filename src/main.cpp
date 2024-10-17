@@ -105,10 +105,11 @@ void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw
     uint8_t* pic  = new uint8_t[col * str * 3];
     uint8_t* data = new uint8_t[col * str];
 
-    Signal* testSig = new TestSignal(weight);
-    Signal specture(col, str);
+    Signal* testSig         = new TestSignal(weight);
+    Signal* noiseSig        = nullptr;
+    Signal  specture(col, str);
     Signal* filteredSpectre = nullptr;
-    Signal filteredPic(col, str);
+    Signal  filteredPic(col, str);
 
     std::complex<double>** sig     = nullptr;
     std::complex<double>** spec    = nullptr;
@@ -121,15 +122,20 @@ void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
+    noiseSig = new Signal(*testSig);
+
     // Adding noize
-    g_noizeSignal(*testSig, noizeLevel);
-    testSig->GetPicture(data, true);
+    g_noizeSignal(*noiseSig, noizeLevel);
+    noiseSig->GetPicture(data, true);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
 
+    std::cout << "SNR (square error): " << testSig->GetSquareError(*noiseSig) << " (Db)" << std::endl;
+    std::cout << "SNR (pixel error): " << testSig->GetPixelError(*noiseSig) << " (Db)" << std::endl;
+
     // Get fft
-    sig  = testSig->GetDataArray();
+    sig  = noiseSig->GetDataArray();
     spec = specture.GetDataArray();
 
     g_mfftDir(sig, spec, str, col, FT_DIRECT);
@@ -188,6 +194,7 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     uint8_t* data = new uint8_t[col * str];
 
     Signal* testSig = new GaussSignal(numberOfGauss, x0.data(), y0.data(), ampl.data(), sigmaX.data(), sigmaY.data());
+    Signal* noiseSig = nullptr;
     Signal specture(col, str);
     Signal* filteredSpectre = nullptr;
     Signal filteredPic(col, str);
@@ -203,9 +210,14 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
+    noiseSig = new Signal(*testSig);
+
     // Adding noize
-    g_noizeSignal(*testSig, noizeLevel);
-    testSig->GetPicture(data, true);
+    g_noizeSignal(*noiseSig, noizeLevel);
+    noiseSig->GetPicture(data, true);
+
+    std::cout << "SNR (square error): " << testSig->GetSquareError(*noiseSig) << " (Db)" << std::endl;
+    std::cout << "SNR (pixel error): " << testSig->GetSquareError(*noiseSig) << " (Db):" << std::endl;
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
@@ -244,6 +256,9 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Filtered.bmp"), col, str, pic);
+
+    std::cout << "SNR (square error): " << testSig->GetSquareError(filteredPic) << " (Db)" << std::endl;
+    std::cout << "SNR (pixel error): " << testSig->GetSquareError(filteredPic) << " (Db):" << std::endl;
 
     delete[] pic;
     delete[] data;
