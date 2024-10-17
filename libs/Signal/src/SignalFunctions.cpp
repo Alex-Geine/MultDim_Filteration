@@ -258,7 +258,7 @@ Signal* g_squareFiltration(Signal& sig, double Db)
         dIdx = 1;
     if (dIdy == 0)
         dIdy = 1;
-    
+
     double energyRealSig = sig.GetEnergy();
     double energyFiltSig = filteredSignal->GetEnergy();
 
@@ -267,12 +267,11 @@ Signal* g_squareFiltration(Signal& sig, double Db)
 
     double curLevel = 10 * std::log10(energyRealSig / energyFiltSig);
 
+    std::cout << "Db: " << Db << ", curLevel: " << curLevel << std::endl;
+
     // Processing filtration
     while (Db > curLevel)
     {
-        std::cout << "Iteration..." << std::endl;
-        std::cout << "Cur level: " << curLevel << std::endl;
-        std::cout << "SNR: " << Db << std::endl;
         if ((idx <= dIdx) && (idy <= dIdy))
         {
             realSigData[0][0]     = deletedValue;
