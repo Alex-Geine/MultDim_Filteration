@@ -327,3 +327,179 @@ Signal* g_squareFiltration(Signal& sig, double Db)
 
     return filteredSignal;
 };
+
+bool isInside(std::vector<uint64_t> vec, uint64_t val)
+{
+    for (uint64_t i = 0; i < vec.size(); ++i)
+        if (vec.at(i) == val)
+            return true;
+    return false;
+};
+
+// Interpolation function
+Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
+{
+    if (width <= sig.GetNumberOfColomns())
+    {
+        std::cout << "Width are too small!" << std::endl;
+        return nullptr;
+    }
+
+    Signal* newSig = new Signal(width, height);
+
+    uint64_t col = sig.GetNumberOfColomns();
+    uint64_t str = sig.GetNumberOfStrings();
+
+    std::complex<double>** data    = sig.GetDataArray();
+    std::complex<double>** newData = newSig->GetDataArray();
+    std::complex<double>   pixelVal = {-777, -777};
+
+    // Find new places for new values
+    std::vector<uint64_t> placesCol;
+    std::vector<uint64_t> placesStr;
+
+    //std::cout << "Places: " << std::endl;
+    //for (uint64_t i = 0; i < places.size(); ++i)
+    //    std::cout << places.at(i) << " ";
+    //std::cout << std::endl;
+
+    //for (int i = 0; i < height; ++i)
+    //    for (int j = 0; j < places.size(); ++j)
+    //            newData[i][places.at(j)]= pixelVal;
+    
+    double koefCol    = width / col - 1;
+    double koefStr    = height / str - 1;
+    double counterCol = 0;
+    double counterStr = 0;
+    bool   flagCol    = false;
+    int    colCounter = 0;
+    int    strCounter = 0;
+
+    std::cout << "Old width: " << col << ", new width: " << width << ", koefCol: " << koefCol << ", koefStr: " << koefStr << std::endl;
+
+    std::complex<double> temp;
+
+    // Strings
+    std::cout << "Strings places: " << std::endl;
+    for (int i = 0; i < height; ++i)
+    {
+        if (counterStr >= 1)
+        {
+            counterStr -= 1;
+            placesStr.push_back(i);
+            std::cout << i << " ";
+        }
+        else
+        {
+            counterStr += koefStr;
+        }
+    }
+    std::cout << std::endl;
+
+    std::cout << "Colomns places: " << std::endl;
+    //Colomns
+    for (int i = 0; i < width; ++i)
+    {
+        if (counterCol >= 1)
+        {
+            counterCol -= 1;
+            placesCol.push_back(i);
+            std::cout << i << " ";
+        }
+        else
+        {
+            counterCol += koefCol;
+        }
+    }
+    std::cout << std::endl;
+    
+    uint64_t* placesDataCol = placesCol.data();
+    uint64_t* placesDataStr = placesStr.data();
+    
+    for (int j = 0; j < width; ++j)
+    {
+        std::cout << "Places data col: " << *placesDataCol << std::endl;
+        if (placesDataCol != nullptr)
+        {
+            if ((*placesDataCol == j))
+            {
+                placesDataCol += 1;
+                flagCol = true;
+            }
+            else
+            {
+                flagCol = false;
+            }
+        }
+
+        for (int i = 0; i < height; ++i)
+        {
+            if (placesDataStr != nullptr)
+            {
+                if (*placesDataStr == i)
+                {
+                    placesDataStr += 1;
+                    newData[i][j]  = pixelVal;
+                }
+            }
+            else if (flagCol)
+            {
+                newData[i][j] = pixelVal;
+            }
+            else
+            {
+                newData[i][j] = data[i][colCounter];
+            }
+        }
+        placesDataStr = placesStr.data();
+
+        if ( !flagCol )
+            colCounter += 1;
+    }
+
+    std::cout << "Old data: " << std::endl;
+    for (uint32_t i = 0; i < str; ++i)
+    {
+        for(uint32_t j = 0; j < col; ++j)
+        {
+            std::cout << data[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << "New data: " << std::endl;
+    for (uint32_t i = 0; i < height; ++i)
+    {
+        for (uint32_t j = 0; j < width; ++j)
+        {
+            std::cout << newData[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    // interpolation
+    for (int j = 0; j < placesCol.size(); ++j)
+    {
+        for (int i = 0; i < height; ++i)
+        {
+            newData[i][placesCol.at(j)] = newData[i][placesCol.at(j) - 1];
+
+            if (placesCol.at(j) + 1 != width)
+                newData[i][placesCol.at(j)] += newData[i][placesCol.at(j) + 1];
+            
+            newData[i][placesCol.at(j)] /= 2.;
+        }
+    }
+
+    std::cout << "New data after interpolation: " << std::endl;
+    for (uint32_t i = 0; i < height; ++i)
+    {
+        for (uint32_t j = 0; j < width; ++j)
+        {
+            std::cout << newData[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return newSig;
+};

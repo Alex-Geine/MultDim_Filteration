@@ -239,6 +239,9 @@ double Signal::GetPixelError(Signal& sig)
 
     sum /= size;
 
+    delete[] signalFirst;
+    delete[] signalSecond;
+
     if (sum == 0)
         return 9999;
 

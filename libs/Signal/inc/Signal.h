@@ -7,7 +7,7 @@
 #include <time.h>
 #include <cstdint>
 
-#define  N                     1024                         // Base dimension of signal
+#define  N                     8                         // Base dimension of signal
 #define  NUMBER_IS_2_POW_K(x)   ((!((x)&((x)-1)))&&((x)>1))  // x is pow(2, k), k=1,2, ...
 #define  FT_DIRECT              -1                           // Direct transform.
 #define  FT_INVERSE             1                            // Inverse transform.
@@ -205,5 +205,8 @@ bool g_noizeSignal(Signal& sig, double Db);
 
 // Filtration function
 Signal* g_squareFiltration(Signal& sig, double Db);
+
+// Interpolation function
+Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height);
 
 #endif    // SIGNAL_H
