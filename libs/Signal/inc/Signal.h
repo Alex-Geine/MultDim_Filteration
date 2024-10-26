@@ -114,6 +114,11 @@ class GaussSignal : public Signal
     GaussSignal( uint64_t numberOfGauss,
                  double* x0Array, double* y0Array, double* amplArray,
                  double* sigmaXArray, double* sigmaYArray );
+
+    // Constructor
+    GaussSignal( uint64_t n, uint64_t numberOfGauss,
+                 double* x0Array, double* y0Array, double* amplArray,
+                 double* sigmaXArray, double* sigmaYArray );
 };
 
 // Class whitch representation test signal (square)
@@ -143,6 +148,9 @@ class TestSignal : public Signal
 
     // Constructor
     TestSignal(double weight);
+
+    // Constructor
+    TestSignal(double weight, uint64_t n);
 };
 
 class RealSignal : public Signal
