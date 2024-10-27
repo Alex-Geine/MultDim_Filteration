@@ -34,9 +34,9 @@ void TestPicNew(double noizeLevel, double filterLevel, std::string logScaleAnsw)
 
 void GaussPic(double noizeLevel, double filterLevel, std::string logScaleAnsw);
 
-void NaturePic(double noizeLevel, double filterLevel, std::string logScaleAnsw);
+void NaturePic(double noizeLevel, double filterLevel, std::string logScaleAnsw, std::string filePath);
 
-void NaturePicInterpol(double noizeLevel, double filterLevel, std::string logScaleAnsw);
+void NaturePicInterpol(double noizeLevel, double filterLevel, std::string logScaleAnsw, std::string filePath);
 
 void TestInter()
 {
@@ -196,6 +196,7 @@ int main(int argc,char **argv)
            std::cin >> n >> w >> scale;
 
            TestSquareInterpol(n, w, scale);
+           continue;
        }
        else if (funk == 5)
        {
@@ -205,6 +206,7 @@ int main(int argc,char **argv)
            std::cin >> n >> scale;
 
            GaussInterpolTest(n, scale);
+           continue;
        }
        else
        {
@@ -226,12 +228,20 @@ int main(int argc,char **argv)
        }
        else if (funk == 3)
        {
+           std::string picType;
+           std::string picPath("../img/gnature.bmp");
            std::cout << "Interpolation (y/n)?" << std::endl;
            std::cin >> interAnsw;
+           std::cout << "Nature or cartoon (n/c)?" << std::endl;
+           std::cin >> picType;
+
+           if (picType == "c")
+               picPath = "../img/not-gnature.bmp";
+
            if (interAnsw == "y")
-               NaturePicInpterpol(noiseLevel, filterLevel, logScaleAnsw, interAnsw);
+               NaturePicInterpol(noiseLevel, filterLevel, logScaleAnsw, picPath);
            else
-               NaturePic(noiseLevel, filterLevel, logScaleAnsw, interAnsw);
+               NaturePic(noiseLevel, filterLevel, logScaleAnsw, picPath);
        }
        else
        {
@@ -323,6 +333,10 @@ void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw
 
     delete[] pic;
     delete[] data;
+
+    delete testSig;
+    delete noiseSig;
+    delete filteredSpectre;
 };
 
 void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
@@ -353,6 +367,8 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     std::complex<double>** filSpec = nullptr;
     std::complex<double>** filPic  = nullptr;
 
+    std::cout << "Gen signal" << std::endl;
+
     // Gen Signal
     testSig->GetPicture(data, false);
 
@@ -361,6 +377,7 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
 
     noiseSig = new Signal(*testSig);
 
+    std::cout << "Add noise..." << std::endl;
     // Adding noize
     g_noizeSignal(*noiseSig, noizeLevel);
     noiseSig->GetPicture(data, false);
@@ -376,6 +393,7 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     spec = specture.GetDataArray();
 
     g_mfftDir(sig, spec, str, col, FT_DIRECT);
+    std::cout << "FFT is Ok!" << std::endl;
 
     filteredSpectre = g_squareFiltration(specture, filterLevel);
 
@@ -387,6 +405,7 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
+    std::cout << "Filtered specture is ready!" << std::endl;
     // Out filtered spectre
     filteredSpectre->GetPicture(data, false);
     if (logScaleAnsw == "y")
@@ -400,6 +419,7 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     filPic = filteredPic.GetDataArray();
 
     g_mfftDir(filSpec, filPic, str, col, FT_INVERSE);
+    std::cout << "Inverce FFT is ready!" << std::endl;
 
     filteredPic.GetPicture(data, false);
 
@@ -411,9 +431,13 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
 
     delete[] pic;
     delete[] data;
+
+    delete testSig;
+    delete noiseSig;
+    delete filteredSpectre;
 };
 
-void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
+void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw, std::string filePath)
 {
     uint32_t col         = 0;
     uint32_t str         = 0;
@@ -426,7 +450,7 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
 
     std::cout << "loading..." << std::endl;
 
-    g_loadImage(std::string("../img/gnature.bmp"), col, str, &inPic);
+    g_loadImage(filePath, col, str, &inPic);
 
     std::cout << "load complete!" << std::endl;
 
@@ -548,7 +572,7 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     delete filteredSpectre;
 };
 
-void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
+void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logScaleAnsw, std::string filePath)
 {
     uint32_t col         = 0;
     uint32_t str         = 0;
@@ -561,7 +585,7 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
 
     std::cout << "loading..." << std::endl;
 
-    g_loadImage(std::string("../img/gnature.bmp"), col, str, &inPic);
+    g_loadImage(filePath, col, str, &inPic);
 
     std::cout << "load complete!" << std::endl;
 
@@ -577,7 +601,8 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     //std::cout << "Creating signal..." << std::endl;
     //std::cout << "Col: " << col << ", str: " << str << std::endl;
     RealSignal* testSig = new RealSignal(data, col, str);
-    RealSignal* noiseSig = nullptr;
+    Signal* noiseSig = nullptr;
+    //Signal*     interpol = nullptr;
 
     acCol = testSig->GetNumberOfColomns();
     acStr = testSig->GetNumberOfStrings();
@@ -587,7 +612,8 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     std::cout << "Signal created!" << std::endl;
     Signal specture(acCol, acStr);
     Signal* filteredSpectre = nullptr;
-    RealSignal* filteredPic = new RealSignal(data, col, str);
+    Signal* filteredPic     = new Signal(acCol, acStr);
+    Signal* interpol        = nullptr;
 
     std::complex<double>** sig     = nullptr;
     std::complex<double>** spec    = nullptr;
@@ -601,25 +627,27 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
-    testSig->Resize();    // To data
+    // Interpolation
+    interpol = g_linInterpol(*testSig, acCol, acStr);
 
-    noiseSig = new RealSignal(*testSig);
+    interpol->GetPicture(dataSpec, false);
+
+    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
+    g_safeImage(std::string("SignalInterpol.bmp"), acCol, acStr, picSpec);
+
+    noiseSig = new Signal(*interpol);
 
     // Adding noize
     g_noizeSignal(*noiseSig, noizeLevel);
-    noiseSig->Resize();    // To pic
-    noiseSig->GetPicture(data, false);
+    noiseSig->GetPicture(dataSpec, false);
 
-    testSig->Resize();    // To pic
+    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
+    g_safeImage(std::string("NoizeSignal.bmp"), acCol, acStr, picSpec);
 
-    std::cout << "SNR: (square error): " << testSig->GetSquareError(*noiseSig) << " (Db)" << std::endl;
-    std::cout << "SNR: (pixel error): " << testSig->GetPixelError(*noiseSig) << " (Db)" << std::endl;
-
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
+    std::cout << "SNR: (square error): " << interpol->GetSquareError(*noiseSig) << " (Db)" << std::endl;
+    std::cout << "SNR: (pixel error): " << interpol->GetPixelError(*noiseSig) << " (Db)" << std::endl;
 
     // Get fft
-    noiseSig->Resize();    // To data
     sig  = noiseSig->GetDataArray();
     spec = specture.GetDataArray();
 
@@ -659,18 +687,15 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     if (g_mfftDir(filSpec, filPic, acStr, acCol, FT_INVERSE))
         std::cout << "Inv FFT is ok!" << std::endl;
 
-    filteredPic->Resize();
+    filteredPic->GetPicture(dataSpec, false);
 
-    filteredPic->GetPicture(data, false);
+    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
+    g_safeImage(std::string("Filtered.bmp"), acCol, acStr, picSpec);
 
-    g_toGrayScaleOut(col, str, data, pic);
-    g_safeImage(std::string("Filtered.bmp"), col, str, pic);
+    std::cout << "SNR (square error): " << interpol->GetSquareError(*filteredPic) << " (Db)" << std::endl;
+    std::cout << "SNR (pixel error): " << interpol->GetPixelError(*filteredPic) << " (Db)" << std::endl;
 
-    std::cout << "SNR (square error): " << testSig->GetSquareError(*filteredPic) << " (Db)" << std::endl;
-    std::cout << "SNR (pixel error): " << testSig->GetPixelError(*filteredPic) << " (Db)" << std::endl;
-
-    testSig->Resize();
-    filteredPic->Resize();
+    testSig->Resize();  // to data
 
     delete[] inPic;
     delete[] data;
@@ -681,4 +706,5 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     delete noiseSig;
     delete filteredPic;
     delete filteredSpectre;
+    delete interpol;
 };

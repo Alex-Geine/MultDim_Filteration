@@ -362,17 +362,8 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
     std::vector<uint64_t> placesCol;
     std::vector<uint64_t> placesStr;
 
-    //std::cout << "Places: " << std::endl;
-    //for (uint64_t i = 0; i < places.size(); ++i)
-    //    std::cout << places.at(i) << " ";
-    //std::cout << std::endl;
-
-    //for (int i = 0; i < height; ++i)
-    //    for (int j = 0; j < places.size(); ++j)
-    //            newData[i][places.at(j)]= pixelVal;
-    
-    double koefCol    = width / col - 1;
-    double koefStr    = height / str - 1;
+    double koefCol    = (double)width / (double)col - 1.;
+    double koefStr    = (double)height / (double)str - 1.;
     double counterCol = 0;
     double counterStr = 0;
     bool   flagCol    = false;
@@ -380,7 +371,9 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
     int    colCounter = 0;
     int    strCounter = 0;
 
-    std::cout << "Old width: " << col << ", new width: " << width << ", koefCol: " << koefCol << ", koefStr: " << koefStr << std::endl;
+    std::cout << "Old width: " << col << ", new width: " << width 
+              << ", old height: " << str << ", new height: " << height 
+              << ", koefCol: " << koefCol << ", koefStr: " << koefStr << std::endl;
 
     std::complex<double> temp;
 
@@ -421,18 +414,22 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
     
     uint64_t* placesDataCol = placesCol.data();
     uint64_t* placesDataStr = placesStr.data();
-    
+    uint64_t lastCol = placesCol.back();
+    uint64_t lastStr = placesStr.back();
+
     // colomns proc
     for (int j = 0; j < width; ++j)
     {
 
         if ( !placesCol.empty() )
         {
-            std::cout << "Places data col: " << *placesDataCol << std::endl;
-
-            if ((*placesDataCol == j))
+            if ((*placesDataCol == j) && (*placesDataCol != lastCol))
             {
                 placesDataCol += 1;
+                flagCol = true;
+            }
+            else if (*placesDataCol == j)
+            {
                 flagCol = true;
             }
             else
@@ -453,7 +450,7 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
             }
         }
 
-        if ( !flagCol )
+        if ( !flagCol && (colCounter < col - 1) )
             colCounter += 1;
     }
 
@@ -477,11 +474,13 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
 
         if ( !placesStr.empty() )
         {
-            std::cout << "Places data str: " << *placesDataStr << std::endl;
-
-            if ((*placesDataStr == i))
+            if ((*placesDataStr == i) && (*placesDataStr != lastStr))
             {
                 placesDataStr += 1;
+                flagStr = true;
+            }
+            else if (*placesDataStr == i)
+            {
                 flagStr = true;
             }
             else
@@ -489,8 +488,6 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
                 flagStr = false;
             }
         }
-
-        std::cout << "After config..." << std::endl;
 
         for (int j = 0; j < width; ++j)
         {
@@ -504,30 +501,8 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
             }
         }
 
-        std::cout << "After copying..." << std::endl;
-
-        if ( !flagStr )
+        if ( (!flagStr) && (strCounter < str - 1))
             strCounter += 1;
-    }
-
-    std::cout << "Old data: " << std::endl;
-    for (uint32_t i = 0; i < str; ++i)
-    {
-        for(uint32_t j = 0; j < col; ++j)
-        {
-            std::cout << data[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << "New data: " << std::endl;
-    for (uint32_t i = 0; i < height; ++i)
-    {
-        for (uint32_t j = 0; j < width; ++j)
-        {
-            std::cout << newData[i][j] << " ";
-        }
-        std::cout << std::endl;
     }
 
     // interpolation strings
@@ -542,16 +517,6 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
             
             newData[placesStr.at(i)][j] /= 2.;
         }
-    }
-
-    std::cout << "New data after interpolation: " << std::endl;
-    for (uint32_t i = 0; i < height; ++i)
-    {
-        for (uint32_t j = 0; j < width; ++j)
-        {
-            std::cout << newData[i][j] << " ";
-        }
-        std::cout << std::endl;
     }
 
     for (uint64_t i = 0; i < str; ++i)

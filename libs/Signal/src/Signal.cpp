@@ -209,6 +209,9 @@ void Signal::DeleteDataArray()
 // Get square error
 double Signal::GetSquareError(Signal& sig)
 {
+    if (GetEnergy() <= 1E-10)
+        return 7777;
+
     double sum = 0;
     std::complex<double>** sigData = sig.GetDataArray();
 
@@ -216,7 +219,7 @@ double Signal::GetSquareError(Signal& sig)
         for (uint64_t j = 0; j < m_colomns; ++j)
             sum += (std::abs(m_dataArray[i][j]) - std::abs(sigData[i][j])) * (std::abs(m_dataArray[i][j]) - std::abs(sigData[i][j]));
 
-    if (sum == 0)
+    if (sum <= 1E-10)
        return 9999;
 
     return 10 * std::log(GetEnergy() / sum);
@@ -242,7 +245,7 @@ double Signal::GetPixelError(Signal& sig)
     delete[] signalFirst;
     delete[] signalSecond;
 
-    if (sum == 0)
+    if (sum <= 1E-10)
         return 9999;
 
     return 10 * std::log10(255 * 255 / sum);
