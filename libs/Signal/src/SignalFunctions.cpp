@@ -226,7 +226,9 @@ bool g_noizeSignal(Signal& sig, double Db)
 };
 
 // Filtration function
-Signal* g_squareFiltration(Signal& sig, double Db)
+// [out] x - colomns
+// [out] y - strings
+Signal* g_squareFiltration(Signal& sig, double Db, uint64_t& x, uint64_t& y)
 {
     if (Db < 0)
         Db = 0;
@@ -324,6 +326,9 @@ Signal* g_squareFiltration(Signal& sig, double Db)
 
     realSigData[0][0]     = deletedValue;
     filteredSigData[0][0] = deletedValue;
+
+    x = idx;
+    y = idy;
 
     return filteredSignal;
 };

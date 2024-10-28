@@ -30,6 +30,56 @@ void logScale(uint8_t* data, uint64_t col, uint64_t str)
        data[i] = 255 * std::log2(1 + data[i] * data[i]) / std::log2(1 + max * max);
 }
 
+// Function added some border on spectre for filtration window
+void addWindowBorder(uint8_t* data, uint64_t col, uint64_t str, uint64_t x, uint64_t y, bool isInverse)
+{
+    uint64_t midCol = col / 2;
+    uint64_t midStr = str / 2;
+
+    if ((data == nullptr) || (midCol < y) || (midStr < x))
+        return;
+
+    uint8_t pixel = 255;
+    if (isInverse)
+        pixel = 0;
+
+    uint64_t dx = midCol - x;    // center - border (strings)
+    uint64_t dy = midStr - y;    // center - border (colomns)
+
+    // strings
+    for (uint64_t i = 0; i < midStr ; ++i)
+    {
+        if (i < y)   // < str
+        {
+            // left top
+            data[i][x] = pixel;       // 1d array !!!!
+            // right top
+            data[i][midCol + dx] = pixel;
+            // left bot
+            data[str - i][x] = pixel;
+            // right bot
+            data[str - i][midCol + dx] = pixel;
+        }
+    }
+
+    // colomns
+    for (uint64_t i = 0; i < midCol; ++i)
+    {
+        if (i < x)    // < col
+        {
+            // left top
+            data[y][i] = pixel;       // 1d array !!!!
+            // right top
+            data[midStr + dy][i] = pixel;
+            // left bot
+            data[y][col - i] = pixel;
+            // right bot
+            data[midStr + dy][col - i] = pixel;
+        }
+    }
+}
+
+
 void TestPicNew(double noizeLevel, double filterLevel, std::string logScaleAnsw);
 
 void GaussPic(double noizeLevel, double filterLevel, std::string logScaleAnsw);
@@ -258,8 +308,10 @@ void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw
     uint32_t col         = N;
     uint32_t str         = N;
     double   weight      = 1;
-    double   noizeLevel  = noiseLevel;   // In Db
+    double   noizeLevel  = noiseLevel;    // In Db
     double   filterLevel = _filterLevel;  // In Db
+    uint64_t x = 0;                       // X coordinate for filtration window
+    uint64_t y = 0;                       // Y coordinate for filtration window
 
     uint8_t* pic  = new uint8_t[col * str * 3];
     uint8_t* data = new uint8_t[col * str];
@@ -299,7 +351,7 @@ void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw
 
     g_mfftDir(sig, spec, str, col, FT_DIRECT);
 
-    filteredSpectre = g_squareFiltration(specture, filterLevel);
+    filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
     // Out spectre
     specture.GetPicture(data, false);
@@ -345,6 +397,8 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     uint32_t str         = N;
     double   noizeLevel  = noiseLevel;   // In Db
     double   filterLevel = _filterLevel;  // In Db
+    uint64_t x = 0;                       // X coordinate for filtration window
+    uint64_t y = 0;                       // Y coordinate for filtration window
 
     uint32_t numberOfGauss = 3;
     std::vector<double> x0{-0.2, 0, -0.4};
@@ -395,7 +449,7 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     g_mfftDir(sig, spec, str, col, FT_DIRECT);
     std::cout << "FFT is Ok!" << std::endl;
 
-    filteredSpectre = g_squareFiltration(specture, filterLevel);
+    filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
     // Out spectre
     specture.GetPicture(data, false);
@@ -445,6 +499,8 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw,
     uint32_t acStr       = 0;
     double   noizeLevel  = noiseLevel;   // In Db
     double   filterLevel = _filterLevel;  // In Db
+    uint64_t x = 0;                       // X coordinate for filtration window
+    uint64_t y = 0;                       // Y coordinate for filtration window
 
     uint8_t* inPic = nullptr;
 
@@ -531,7 +587,7 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw,
     g_safeImage(std::string("Specture.bmp"), acCol, acStr, picSpec);
 
     //std::cout << "Filter specture..." << std::endl;
-    filteredSpectre = g_squareFiltration(specture, filterLevel);
+    filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
     // Draw fil spec
     filteredSpectre->GetPicture(dataSpec, false);
@@ -580,6 +636,8 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     uint32_t acStr       = 0;
     double   noizeLevel  = noiseLevel;   // In Db
     double   filterLevel = _filterLevel;  // In Db
+    uint64_t x = 0;                       // X coordinate for filtration window
+    uint64_t y = 0;                       // Y coordinate for filtration window
 
     uint8_t* inPic = nullptr;
 
@@ -670,7 +728,7 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     g_safeImage(std::string("Specture.bmp"), acCol, acStr, picSpec);
 
     //std::cout << "Filter specture..." << std::endl;
-    filteredSpectre = g_squareFiltration(specture, filterLevel);
+    filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
     // Draw fil spec
     filteredSpectre->GetPicture(dataSpec, false);

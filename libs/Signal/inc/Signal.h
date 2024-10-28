@@ -212,7 +212,7 @@ bool g_fft(std::complex<double>* inData, std::complex<double>* outData, uint64_t
 bool g_noizeSignal(Signal& sig, double Db);
 
 // Filtration function
-Signal* g_squareFiltration(Signal& sig, double Db);
+Signal* g_squareFiltration(Signal& sig, double Db, uint64_t& x, uint64_t& y);
 
 // Interpolation function
 Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height);
