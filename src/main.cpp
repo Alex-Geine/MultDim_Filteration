@@ -17,6 +17,7 @@ void printData(uint8_t* data, uint32_t col, uint32_t str)
     std::cout << std::endl;
 }
 
+// log scale for pixel data
 void logScale(uint8_t* data, uint64_t col, uint64_t str)
 {
     uint64_t size = col * str;
@@ -28,6 +29,14 @@ void logScale(uint8_t* data, uint64_t col, uint64_t str)
 
     for (uint64_t i = 0; i < size; ++i)
        data[i] = 255 * std::log2(1 + data[i] * data[i]) / std::log2(1 + max * max);
+}
+
+// log scale for real data
+void logScale(std:complex<double>** data, uint32_t col, uint32_t str)
+{
+    for (uint64_t i = 0; i < str; ++i)
+        for (uint64_t j = 0; j < col; ++j)
+            data[i][j] = std::log10(1 + data);
 }
 
 // Function added some border on spectre for filtration window
@@ -52,13 +61,13 @@ void addWindowBorder(uint8_t* data, uint64_t col, uint64_t str, uint64_t x, uint
         if (i < y)   // < str
         {
             // left top
-            data[i][x] = pixel;       // 1d array !!!!
+            data[i * col + x] = pixel;
             // right top
-            data[i][midCol + dx] = pixel;
+            data[i * col + midCol + dx] = pixel;
             // left bot
-            data[str - i][x] = pixel;
+            data[(str - i) * col + x] = pixel;
             // right bot
-            data[str - i][midCol + dx] = pixel;
+            data[(str - i) * col + midCol + dx] = pixel;
         }
     }
 
@@ -68,17 +77,32 @@ void addWindowBorder(uint8_t* data, uint64_t col, uint64_t str, uint64_t x, uint
         if (i < x)    // < col
         {
             // left top
-            data[y][i] = pixel;       // 1d array !!!!
+            data[y * col + i] = pixel;
             // right top
-            data[midStr + dy][i] = pixel;
+            data[(midStr + dy) * col + i] = pixel;
             // left bot
-            data[y][col - i] = pixel;
+            data[y * col + col - i] = pixel;
             // right bot
-            data[midStr + dy][col - i] = pixel;
+            data[(midStr + dy) * col + col - i] = pixel;
         }
     }
 }
 
+// Moving spectre in the middle
+void movingSpectreInTheMiddle(uint8_t* data, uint64_t col, uint64_t str)
+{
+    uint64_t midStr = str / 2;
+    uint64_t midCol = sol / 2;
+
+    for (uint64_t i = 0; i < midStr; ++i)
+    {
+        for (uint64_t j = 0; j < midCol; ++j)
+        {
+            std::swap(data[i * col + j], data[(midStr + i) * col + midCol + j]); // Swap left top - right bot
+            std::swap(data[(midStr + i) * col + j], data[i * col + midCol + j]); // Swap left bot - right top
+        }
+    }
+}
 
 void TestPicNew(double noizeLevel, double filterLevel, std::string logScaleAnsw);
 
