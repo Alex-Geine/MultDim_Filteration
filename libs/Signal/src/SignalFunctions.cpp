@@ -531,3 +531,30 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
 
     return newSig;
 };
+
+// Interpolation function with real interpolation
+Signal* g_linInterpolReal(Signal& sig, uint64_t width, uint64_t height)
+{
+    if (width <= sig.GetNumberOfColomns())
+    {
+        std::cout << "Width are too small!" << std::endl;
+        return nullptr;
+    }
+
+    Signal* newSig = new Signal(width, height);
+
+    uint64_t col = sig.GetNumberOfColomns();
+    uint64_t str = sig.GetNumberOfStrings();
+
+    std::complex<double>** data     = sig.GetDataArray();
+    std::complex<double>** newData  = newSig->GetDataArray();
+    std::complex<double>** tempData = new std::complex<double>*[str];
+    std::complex<double>   pixelVal = {-777, -777};
+
+    for (uint64_t i = 0; i < str; ++i)
+        tempData[i] = new std::complex<double>[width];
+
+    // here some interpolation
+
+    return nullptr;
+};

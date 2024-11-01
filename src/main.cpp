@@ -294,7 +294,9 @@ int main(int argc,char **argv)
 
        if (funk == 1)
        {
-           TestPicNew(noiseLevel, filterLevel, logScaleAnsw);
+            std::cout << "Testing new funcitonal..." << std::endl;
+            TestNewFunc(noiseLevel, filterLevel, logScaleAnsw);
+           //TestPicNew(noiseLevel, filterLevel, logScaleAnsw);
        }
        else if (funk == 2)
        {
@@ -327,7 +329,7 @@ int main(int argc,char **argv)
     return 0;
 };
 
-void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
+void TestNewFunc(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
 {
     uint32_t col         = N;
     uint32_t str         = N;
@@ -378,17 +380,42 @@ void TestPicNew(double noiseLevel, double _filterLevel, std::string logScaleAnsw
     filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
     // Out spectre
-    specture.GetPicture(data, false);
+    std::cout << "Log scaling..." << std::endl;
     if (logScaleAnsw == "y")
-        logScale(data, col, str);
+    {
+        sig = spectre.GetDataArray();
+        logScale(sig, col, str);
+    }
+
+    specture.GetPicture(data, false);
+
+    std::cout << "Added border on spectre..." << std::endl;
+    addWindowBorder(data, col, str, x, y, false);
+
+    std::cout << "Move spec." << std::endl;
+    movingSpectreInTheMiddle(data, col, str);
+    
+//    if (logScaleAnsw == "y")
+//        logScale(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
     // Out filtered spectre
-    filteredSpectre->GetPicture(data, false);
+    std::cout << "Log scaling filtered spec..." << std::endl;
     if (logScaleAnsw == "y")
-        logScale(data, col, str);
+    {
+        sig = filteredSpectre->GetDataArray();
+        logScale(sig, col, str);
+    }
+
+    filteredSpectre->GetPicture(data, false);
+
+    std::cout << "Move filt spec." << std::endl;
+    movingSpectreInTheMiddle(data, col, str);
+    
+//    if (logScaleAnsw == "y")
+//        logScale(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);

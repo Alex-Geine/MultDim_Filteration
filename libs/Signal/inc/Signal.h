@@ -217,4 +217,7 @@ Signal* g_squareFiltration(Signal& sig, double Db, uint64_t& x, uint64_t& y);
 // Interpolation function
 Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height);
 
+// Interpolation function with real interpolation
+Signal* g_linInterpolReal(Signal& sig, uint64_t width, uint64_t height);
+
 #endif    // SIGNAL_H
