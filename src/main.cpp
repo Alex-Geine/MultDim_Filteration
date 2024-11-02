@@ -32,11 +32,11 @@ void logScale(uint8_t* data, uint64_t col, uint64_t str)
 }
 
 // log scale for real data
-void logScale(std:complex<double>** data, uint32_t col, uint32_t str)
+void logScale(std::complex<double>** data, uint32_t col, uint32_t str)
 {
     for (uint64_t i = 0; i < str; ++i)
         for (uint64_t j = 0; j < col; ++j)
-            data[i][j] = std::log10(1 + data);
+            data[i][j] = std::log10(std::complex<double>(1,1) + data[i][j]);
 }
 
 // Function added some border on spectre for filtration window
@@ -92,7 +92,7 @@ void addWindowBorder(uint8_t* data, uint64_t col, uint64_t str, uint64_t x, uint
 void movingSpectreInTheMiddle(uint8_t* data, uint64_t col, uint64_t str)
 {
     uint64_t midStr = str / 2;
-    uint64_t midCol = sol / 2;
+    uint64_t midCol = col / 2;
 
     for (uint64_t i = 0; i < midStr; ++i)
     {
@@ -111,6 +111,8 @@ void GaussPic(double noizeLevel, double filterLevel, std::string logScaleAnsw);
 void NaturePic(double noizeLevel, double filterLevel, std::string logScaleAnsw, std::string filePath);
 
 void NaturePicInterpol(double noizeLevel, double filterLevel, std::string logScaleAnsw, std::string filePath);
+
+void TestNewFunc(double noiseLevel, double _filterLevel, std::string logScaleAnsw);
 
 void TestInter()
 {
@@ -380,14 +382,15 @@ void TestNewFunc(double noiseLevel, double _filterLevel, std::string logScaleAns
     filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
     // Out spectre
+    Signal spectrePic(specture);
     std::cout << "Log scaling..." << std::endl;
     if (logScaleAnsw == "y")
     {
-        sig = spectre.GetDataArray();
+        sig = spectrePic.GetDataArray();
         logScale(sig, col, str);
     }
 
-    specture.GetPicture(data, false);
+    spectrePic.GetPicture(data, false);
 
     std::cout << "Added border on spectre..." << std::endl;
     addWindowBorder(data, col, str, x, y, false);
@@ -402,14 +405,15 @@ void TestNewFunc(double noiseLevel, double _filterLevel, std::string logScaleAns
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
     // Out filtered spectre
+    Signal FilSpecPic(*filteredSpectre);
     std::cout << "Log scaling filtered spec..." << std::endl;
     if (logScaleAnsw == "y")
     {
-        sig = filteredSpectre->GetDataArray();
+        sig = FilSpecPic.GetDataArray();
         logScale(sig, col, str);
     }
 
-    filteredSpectre->GetPicture(data, false);
+    FilSpecPic.GetPicture(data, false);
 
     std::cout << "Move filt spec." << std::endl;
     movingSpectreInTheMiddle(data, col, str);
