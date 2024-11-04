@@ -4,6 +4,9 @@
         "string": "cpp",
         "string_view": "cpp",
         "span": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "compare": "cpp",
+        "cstdint": "cpp",
+        "format": "cpp"
     }
 }

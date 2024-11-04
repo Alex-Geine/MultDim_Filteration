@@ -532,14 +532,94 @@ Signal* g_linInterpol(Signal& sig, uint64_t width, uint64_t height)
     return newSig;
 };
 
+// Find Left / Right element for interpolation
+void g_findLR(uint64_t& left, uint64_t& right, uint64_t mid, uint64_t size, double d_in, double d_out)
+{
+    double valLeft  = left * d_in;
+    double valRight = right * d_in;
+    double valMid   = mid * d_out;
+
+    if ((valLeft < valMid) && (valRight > valMid)) // left < mid < right
+    {
+        return;
+    }
+
+    // Left
+    for (uint64_t i = left + 1; i < size; ++i)
+    {
+        valLeft += d_in;
+        
+        if (valLeft > valMid)
+        {
+            left = i - 1;
+            break;
+        }
+    }
+
+    // Right
+    for (uint64_t i = right + 1; i < size; ++i)
+    {
+        valRight += d_in;
+
+        if (valRight > valMid)
+        {
+            right = i;
+            break;
+        }
+    }
+
+    return;
+}
+
+double g_interpol(std::pair<double, double> p0, std::pair<double, double> p1, double x_res)
+{
+    if (p0.second > p1.second)   // (x - x0) / (x1 - x0) = (y - y0) / (y1 - y0)
+        return (x_res - p0.first) / (p1.first - p0.first) * (p1.second - p0.second) + p0.second;
+    else // (x1 - x) / (x1 - x0) = (y - y1) / (y1 - y0)
+        return (p1.first - x_res) / (p1.first - p0.first) * (p0.second - p1.second) + p1.second;
+}
+
+// Interpolation func for 1d array
+void g_linInterpolOneDim(const std::vector<double> in, std::vector<double>& out)
+{
+    //std::cout << "lin interpol 1d" << std::endl;
+
+    uint64_t sizeIn  = in.size();
+    uint64_t sizeOut = out.size();
+
+    double d_in  = 1. / (double)sizeIn;
+    double d_out = 1. / (double)sizeOut;
+
+   // std::cout << "in: " << sizeIn << ", out: " << sizeOut << std::endl;
+
+    uint64_t left  = 0;
+    uint64_t right = 0;
+
+    std::pair<double, double> leftP;
+    std::pair<double, double> rightP;
+
+    for (uint64_t i = 0; i < sizeOut; ++i)
+    {
+        g_findLR(left, right, i, sizeIn, d_in, d_out);
+        leftP  = {(double)left * d_in, in.at(left)};
+        rightP = {(double)right * d_in, in.at(right)};
+
+        // interpolation
+        out[i] = g_interpol(leftP, rightP, i * d_out);
+    }
+}
+
 // Interpolation function with real interpolation
 Signal* g_linInterpolReal(Signal& sig, uint64_t width, uint64_t height)
 {
-    if (width <= sig.GetNumberOfColomns())
-    {
-        std::cout << "Width are too small!" << std::endl;
-        return nullptr;
-    }
+    std::cout << "Interpolation!" << std::endl;
+    //if (width <= sig.GetNumberOfColomns())
+    //{
+    //    std::cout << "Width are too small!" << std::endl;
+    //    return nullptr;
+    //}
+
+    std::cout << "Width: " << width << ", height: " << height << std::endl;
 
     Signal* newSig = new Signal(width, height);
 
@@ -551,10 +631,57 @@ Signal* g_linInterpolReal(Signal& sig, uint64_t width, uint64_t height)
     std::complex<double>** tempData = new std::complex<double>*[str];
     std::complex<double>   pixelVal = {-777, -777};
 
+    std::vector<double> in;
+    std::vector<double> out;
+
     for (uint64_t i = 0; i < str; ++i)
         tempData[i] = new std::complex<double>[width];
-
+ 
     // here some interpolation
 
-    return nullptr;
+    // colomns
+    //std::cout << "Colomns proc..." << std::endl;    
+    
+    in.resize(col);
+    out.resize(width);
+
+    for (uint64_t i = 0; i < str; ++i)
+    {
+        //std::cout << "str: " << i << "in size: " << in.size() << ", out size: " << out.size() <<  std::endl;
+
+        for (uint64_t j = 0; j < col; ++j)
+            in[j] = data[i][j].real();
+
+        g_linInterpolOneDim(in, out);
+
+        for (uint64_t j = 0; j < width; ++j)
+            tempData[i][j] = {out.at(j), 0};
+    }
+
+    // strings
+    //std::cout << "Strings proc..." << std::endl;
+    in.clear();
+    out.clear();
+    in.resize(str);
+    out.resize(height);
+
+    for (uint64_t j = 0; j < width; ++j)
+    {
+        //std::cout << "Col: " << j << ", in size: " << in.size() << ", out size: " << out.size() << std::endl;
+        for (uint64_t i = 0; i < str; ++i)
+            in[i] = tempData[i][j].real();
+
+        g_linInterpolOneDim(in, out);
+
+        for (uint64_t i = 0; i < height; ++i)
+            newData[i][j] = {out.at(i), 0};
+    }
+
+
+    for (uint64_t i = 0; i < str; ++i)
+        delete[] tempData[i];
+
+    delete[] tempData;
+    
+    return newSig;
 };

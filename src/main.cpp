@@ -152,7 +152,7 @@ void TestSquareInterpol(uint64_t n, double w, double scale)
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("SquareSignal.bmp"), col, str, pic);
 
-    interpol = g_linInterpol(*testSig, newCol, newStr);
+    interpol = g_linInterpolReal(*testSig, newCol, newStr);
 
     // Interpol Signal
     interpol->GetPicture(dataNew, false);
@@ -216,7 +216,7 @@ void GaussInterpolTest(uint64_t n, double scale)
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("GaussSignal.bmp"), col, str, pic);
 
-    interpol = g_linInterpol(*testSig, colNew, strNew);
+    interpol = g_linInterpolReal(*testSig, colNew, strNew);
 
     // Interpol Signal
     interpol->GetPicture(dataNew, false);
@@ -398,9 +398,6 @@ void TestNewFunc(double noiseLevel, double _filterLevel, std::string logScaleAns
     std::cout << "Move spec." << std::endl;
     movingSpectreInTheMiddle(data, col, str);
     
-//    if (logScaleAnsw == "y")
-//        logScale(data, col, str);
-
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
@@ -418,9 +415,6 @@ void TestNewFunc(double noiseLevel, double _filterLevel, std::string logScaleAns
     std::cout << "Move filt spec." << std::endl;
     movingSpectreInTheMiddle(data, col, str);
     
-//    if (logScaleAnsw == "y")
-//        logScale(data, col, str);
-
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
 
@@ -507,18 +501,41 @@ void GaussPic(double noiseLevel, double _filterLevel, std::string logScaleAnsw)
     filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
     // Out spectre
-    specture.GetPicture(data, false);
+    Signal spectrePic(specture);
+    std::cout << "Log scaling..." << std::endl;
     if (logScaleAnsw == "y")
-        logScale(data, col, str);
+    {
+        sig = spectrePic.GetDataArray();
+        logScale(sig, col, str);
+    }
+
+    spectrePic.GetPicture(data, false);
+
+    std::cout << "Added border on spectre..." << std::endl;
+    addWindowBorder(data, col, str, x, y, false);
+
+    std::cout << "Move spec." << std::endl;
+    movingSpectreInTheMiddle(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Specture.bmp"), col, str, pic);
 
-    std::cout << "Filtered specture is ready!" << std::endl;
     // Out filtered spectre
-    filteredSpectre->GetPicture(data, false);
+    Signal FilSpecPic(*filteredSpectre);
+    std::cout << "Log scaling filtered spec..." << std::endl;
     if (logScaleAnsw == "y")
-        logScale(data, col, str);
+    {
+        sig = FilSpecPic.GetDataArray();
+        logScale(sig, col, str);
+    }
+
+    FilSpecPic.GetPicture(data, false);
+
+    std::cout << "Added border on spectre..." << std::endl;
+    addWindowBorder(data, col, str, x, y, false);
+
+    std::cout << "Move spec." << std::endl;
+    movingSpectreInTheMiddle(data, col, str);
 
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("FilSpecture.bmp"), col, str, pic);
@@ -570,12 +587,9 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw,
     uint8_t* dataSpec = nullptr;
     uint8_t* picSpec  = nullptr;
 
-    //std::cout << "GrayScaling..." << std::endl;
     g_toGrayScaleIn(col, str, inPic, data);
     std::cout << "GrayScaling complete!" << std::endl;
 
-    //std::cout << "Creating signal..." << std::endl;
-    //std::cout << "Col: " << col << ", str: " << str << std::endl;
     RealSignal* testSig = new RealSignal(data, col, str);
     RealSignal* noiseSig = nullptr;
 
@@ -633,10 +647,22 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw,
     if (g_mfftDir(sig, spec, acStr, acCol, FT_DIRECT))
         std::cout << "FFT is ok!" << std::endl;
 
-    // Draw spec
-    specture.GetPicture(dataSpec, false);
+    // Out spectre
+    Signal spectrePic(specture);
+    std::cout << "Log scaling..." << std::endl;
     if (logScaleAnsw == "y")
-        logScale(dataSpec, acCol, acStr);
+    {
+        sig = spectrePic.GetDataArray();
+        logScale(sig, acCol, acStr);
+    }
+
+    spectrePic.GetPicture(dataSpec, false);
+
+    std::cout << "Added border on spectre..." << std::endl;
+    addWindowBorder(dataSpec, acCol, acStr, x, y, false);
+
+    std::cout << "Move spec." << std::endl;
+    movingSpectreInTheMiddle(dataSpec, acCol, acStr);
 
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("Specture.bmp"), acCol, acStr, picSpec);
@@ -644,10 +670,23 @@ void NaturePic(double noiseLevel, double _filterLevel, std::string logScaleAnsw,
     //std::cout << "Filter specture..." << std::endl;
     filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
 
-    // Draw fil spec
-    filteredSpectre->GetPicture(dataSpec, false);
+    // Out spectre
+    Signal spectreFilPic(*filteredSpectre);
+    std::cout << "Log scaling..." << std::endl;
     if (logScaleAnsw == "y")
-        logScale(dataSpec, acCol, acStr);
+    {
+        sig = spectreFilPic.GetDataArray();
+        logScale(sig, acCol, acStr);
+    }
+
+    // Draw fil spec
+    spectreFilPic.GetPicture(dataSpec, false);
+
+    std::cout << "Added border on spectre..." << std::endl;
+    addWindowBorder(dataSpec, acCol, acStr, x, y, false);
+
+    std::cout << "Move spec." << std::endl;
+    movingSpectreInTheMiddle(dataSpec, acCol, acStr);
 
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("FilSpecture.bmp"), acCol, acStr, picSpec);
@@ -707,26 +746,25 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     uint8_t* dataSpec = nullptr;
     uint8_t* picSpec  = nullptr;
 
-    //std::cout << "GrayScaling..." << std::endl;
     g_toGrayScaleIn(col, str, inPic, data);
     std::cout << "GrayScaling complete!" << std::endl;
 
-    //std::cout << "Creating signal..." << std::endl;
-    //std::cout << "Col: " << col << ", str: " << str << std::endl;
     RealSignal* testSig = new RealSignal(data, col, str);
     Signal* noiseSig = nullptr;
-    //Signal*     interpol = nullptr;
 
     acCol = testSig->GetNumberOfColomns();
     acStr = testSig->GetNumberOfStrings();
 
     dataSpec = new uint8_t[acCol * acStr];
     picSpec  = new uint8_t[acCol * acStr * 3];
+
     std::cout << "Signal created!" << std::endl;
+
     Signal specture(acCol, acStr);
     Signal* filteredSpectre = nullptr;
     Signal* filteredPic     = new Signal(acCol, acStr);
     Signal* interpol        = nullptr;
+    Signal* invInterpol     = nullptr;
 
     std::complex<double>** sig     = nullptr;
     std::complex<double>** spec    = nullptr;
@@ -740,32 +778,30 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     g_toGrayScaleOut(col, str, data, pic);
     g_safeImage(std::string("Signal.bmp"), col, str, pic);
 
-    // Interpolation
-    interpol = g_linInterpol(*testSig, acCol, acStr);
+    //testSig->Resize(); // To data
 
-    interpol->GetPicture(dataSpec, false);
-
-    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
-    g_safeImage(std::string("SignalInterpol.bmp"), acCol, acStr, picSpec);
-
-    noiseSig = new Signal(*interpol);
+    noiseSig = new Signal(*testSig);  // noise init pic
 
     // Adding noize
     g_noizeSignal(*noiseSig, noizeLevel);
-    noiseSig->GetPicture(dataSpec, false);
+    noiseSig->GetPicture(data, false);
 
-    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
-    g_safeImage(std::string("NoizeSignal.bmp"), acCol, acStr, picSpec);
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("NoizeSignal.bmp"), col, str, pic);
 
-    std::cout << "SNR: (square error): " << interpol->GetSquareError(*noiseSig) << " (Db)" << std::endl;
-    std::cout << "SNR: (pixel error): " << interpol->GetPixelError(*noiseSig) << " (Db)" << std::endl;
+    std::cout << "SNR: (square error): " << testSig->GetSquareError(*noiseSig) << " (Db)" << std::endl;
+    std::cout << "SNR: (pixel error): " << testSig->GetPixelError(*noiseSig) << " (Db)" << std::endl;
+
+    // Interpolation
+//    testSig->Resize(); // To pic
+    interpol = g_linInterpolReal(*noiseSig, acCol, acStr);
 
     // Get fft
-    sig  = noiseSig->GetDataArray();
+    sig  = interpol->GetDataArray();
     spec = specture.GetDataArray();
 
-    std::cout << "SigCol: " << noiseSig->GetNumberOfColomns()
-              << "SigStr: " << noiseSig->GetNumberOfStrings()
+    std::cout << "SigCol: " << interpol->GetNumberOfColomns()
+              << "SigStr: " << interpol->GetNumberOfStrings()
               << std::endl;
     std::cout << "SpecCol: " << specture.GetNumberOfColomns()
               << "SpecStr: " << specture.GetNumberOfStrings()
@@ -774,21 +810,45 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     if (g_mfftDir(sig, spec, acStr, acCol, FT_DIRECT))
         std::cout << "FFT is ok!" << std::endl;
 
-    // Draw spec
-    specture.GetPicture(dataSpec, false);
+    filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
+
+    // Out spectre
+    Signal spectrePic(specture);
+    std::cout << "Log scaling..." << std::endl;
     if (logScaleAnsw == "y")
-        logScale(dataSpec, acCol, acStr);
+    {
+        sig = spectrePic.GetDataArray();
+        logScale(sig, acCol, acStr);
+    }
+
+    spectrePic.GetPicture(dataSpec, false);
+
+    std::cout << "Added border on spectre..." << std::endl;
+    addWindowBorder(dataSpec, acCol, acStr, x, y, false);
+
+    std::cout << "Move spec." << std::endl;
+    movingSpectreInTheMiddle(dataSpec, acCol, acStr);
 
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("Specture.bmp"), acCol, acStr, picSpec);
 
-    //std::cout << "Filter specture..." << std::endl;
-    filteredSpectre = g_squareFiltration(specture, filterLevel, x, y);
+    // Out spectre
+    Signal spectreFilPic(*filteredSpectre);
+    std::cout << "Log scaling..." << std::endl;
+    if (logScaleAnsw == "y")
+    {
+        sig = spectreFilPic.GetDataArray();
+        logScale(sig, acCol, acStr);
+    }
 
     // Draw fil spec
-    filteredSpectre->GetPicture(dataSpec, false);
-    if (logScaleAnsw == "y")
-        logScale(dataSpec, acCol, acStr);
+    spectreFilPic.GetPicture(dataSpec, false);
+
+    std::cout << "Added border on spectre..." << std::endl;
+    addWindowBorder(dataSpec, acCol, acStr, x, y, false);
+
+    std::cout << "Move spec." << std::endl;
+    movingSpectreInTheMiddle(dataSpec, acCol, acStr);
 
     g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
     g_safeImage(std::string("FilSpecture.bmp"), acCol, acStr, picSpec);
@@ -800,13 +860,15 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     if (g_mfftDir(filSpec, filPic, acStr, acCol, FT_INVERSE))
         std::cout << "Inv FFT is ok!" << std::endl;
 
-    filteredPic->GetPicture(dataSpec, false);
+    invInterpol = g_linInterpolReal(*filteredPic, col, str);
 
-    g_toGrayScaleOut(acCol, acStr, dataSpec, picSpec);
-    g_safeImage(std::string("Filtered.bmp"), acCol, acStr, picSpec);
+    invInterpol->GetPicture(data, false);
 
-    std::cout << "SNR (square error): " << interpol->GetSquareError(*filteredPic) << " (Db)" << std::endl;
-    std::cout << "SNR (pixel error): " << interpol->GetPixelError(*filteredPic) << " (Db)" << std::endl;
+    g_toGrayScaleOut(col, str, data, pic);
+    g_safeImage(std::string("Filtered.bmp"), col, str, pic);
+
+    std::cout << "SNR (square error): " << testSig->GetSquareError(*invInterpol) << " (Db)" << std::endl;
+    std::cout << "SNR (pixel error): " << testSig->GetPixelError(*invInterpol) << " (Db)" << std::endl;
 
     testSig->Resize();  // to data
 
@@ -820,4 +882,5 @@ void NaturePicInterpol(double noiseLevel, double _filterLevel, std::string logSc
     delete filteredPic;
     delete filteredSpectre;
     delete interpol;
+    delete invInterpol;
 };
